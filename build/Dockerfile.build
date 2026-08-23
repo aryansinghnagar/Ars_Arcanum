@@ -1,0 +1,21 @@
+# Dockerfile for building Ars Arcanum ISO in an isolated Debian container
+FROM debian:trixie
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    live-build \
+    debootstrap \
+    xorriso \
+    squashfs-tools \
+    git \
+    curl \
+    ca-certificates \
+    dosfstools \
+    isolinux \
+    syslinux-common \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /build
+
+CMD ["/bin/bash", "build/scripts/build_iso.sh"]
