@@ -1,0 +1,12 @@
+/* Ivory Daylight Vellum Theme Snippet */
+.theme-dark, .theme-light {
+  --background-primary: #faf3e0 !important;
+  --background-secondary: #f5ebd0 !important;
+  --background-secondary-alt: #e8dcc8 !important;
+  --text-normal: #2c1810 !important;
+  --text-accent: #8b7355 !important;
+  --interactive-accent: #8b7355 !important;
+  --text-muted: #7d6350 !important;
+  --font-family-editor: "EB Garamond", "Libertinus Serif", serif;
+  --h1-color: #5c3a21 !important;
+}

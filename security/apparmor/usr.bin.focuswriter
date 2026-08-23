@@ -1,0 +1,22 @@
+# AppArmor profile for FocusWriter in Ars Arcanum
+
+abi <abi/3.0>,
+include <tunables/global>
+
+profile focuswriter /usr/bin/focuswriter {
+  include <abstractions/base>
+  include <abstractions/fonts>
+  include <abstractions/X>
+  include <abstractions/freedesktop.org>
+
+  deny network inet,
+  deny network inet6,
+
+  owner @{HOME}/Worlds/** rwkl,
+  owner @{HOME}/.config/GottCode/** rwkl,
+  owner @{HOME}/.local/share/GottCode/** rwkl,
+  /tmp/** rwkl,
+
+  deny @{HOME}/.ssh/** rwklx,
+  deny @{HOME}/.gnupg/** rwklx,
+}

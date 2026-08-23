@@ -1,0 +1,12 @@
+# Grimoire xfwm4 Theme Configuration
+active_text_color=#f5e6c8
+inactive_text_color=#8a7e6b
+active_color_1=#1a1a2e
+active_color_2=#4a1942
+inactive_color_1=#141424
+inactive_color_2=#141424
+active_border_color=#c9a96e
+inactive_border_color=#3d2b1f
+title_alignment=center
+title_font=Cinzel:style=Bold:size=10
+border_width=2

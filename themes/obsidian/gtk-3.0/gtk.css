@@ -1,0 +1,40 @@
+/* Obsidian — Ars Arcanum GTK 3/4 Theme */
+@define-color theme_bg_color #111111;
+@define-color theme_fg_color #ffffff;
+@define-color theme_base_color #080808;
+@define-color theme_text_color #ffffff;
+@define-color theme_selected_bg_color #777777;
+@define-color theme_selected_fg_color #111111;
+@define-color borders #333333;
+
+window, dialog {
+    background-color: @theme_bg_color;
+    color: @theme_fg_color;
+    font-family: "EB Garamond", "Fira Code", monospace, serif;
+}
+
+textview, entry, list, treeview {
+    background-color: @theme_base_color;
+    color: @theme_fg_color;
+    border: 1px solid @borders;
+    border-radius: 2px;
+}
+
+button {
+    background-color: #222222;
+    color: #ffffff;
+    border: 1px solid #777777;
+    border-radius: 2px;
+    padding: 6px 14px;
+    font-weight: bold;
+}
+
+button:hover {
+    background-color: #777777;
+    color: #111111;
+}
+
+headerbar {
+    background-color: #080808;
+    border-bottom: 2px solid #555555;
+}

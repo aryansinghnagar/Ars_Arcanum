@@ -1,0 +1,22 @@
+# AppArmor profile for Blanket in Ars Arcanum
+
+abi <abi/3.0>,
+include <tunables/global>
+
+profile blanket /usr/bin/blanket {
+  include <abstractions/base>
+  include <abstractions/fonts>
+  include <abstractions/audio>
+  include <abstractions/X>
+  include <abstractions/freedesktop.org>
+
+  deny network inet,
+  deny network inet6,
+
+  owner @{HOME}/.config/blanket/** rwkl,
+  owner @{HOME}/.local/share/blanket/** rwkl,
+  /tmp/** rwkl,
+
+  deny @{HOME}/.ssh/** rwklx,
+  deny @{HOME}/.gnupg/** rwklx,
+}

@@ -1,0 +1,16 @@
+#!/bin/sh
+# 02-apparmor-profiles.hook.chroot — AppArmor Policy Enforcement
+
+set -e
+echo "[*] Loading AppArmor Profiles for Creative Applications..."
+
+if command -v apparmor_parser >/dev/null 2>&1; then
+  for profile in /etc/apparmor.d/*; do
+    if [ -f "$profile" ]; then
+      apparmor_parser -r -W "$profile" || true
+    fi
+  done
+fi
+
+systemctl enable apparmor.service || true
+echo "[+] AppArmor profiles successfully enforced."

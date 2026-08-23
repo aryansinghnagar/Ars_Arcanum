@@ -1,0 +1,14 @@
+#!/bin/sh
+set -e
+
+lb config noauto \
+  --distribution trixie \
+  --archive-areas "main contrib non-free non-free-firmware" \
+  --binary-images iso-hybrid \
+  --iso-application "Ars Arcanum" \
+  --iso-publisher "Ars Arcanum Project" \
+  --iso-volume "ARS_ARCANUM" \
+  --memtest none \
+  --bootappend-live "boot=live components quiet splash security=apparmor apparmor=1 lsm=landlock,lockdown,yama,apparmor,bpf" \
+  --apt-recommends false \
+  "${@}"

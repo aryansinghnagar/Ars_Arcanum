@@ -1,0 +1,22 @@
+# AppArmor profile for Manuskript in Ars Arcanum
+
+abi <abi/3.0>,
+include <tunables/global>
+
+profile manuskript /usr/bin/manuskript {
+  include <abstractions/base>
+  include <abstractions/fonts>
+  include <abstractions/python>
+  include <abstractions/X>
+  include <abstractions/freedesktop.org>
+
+  deny network inet,
+  deny network inet6,
+
+  owner @{HOME}/Worlds/** rwkl,
+  owner @{HOME}/.config/manuskript/** rwkl,
+  /tmp/** rwkl,
+
+  deny @{HOME}/.ssh/** rwklx,
+  deny @{HOME}/.gnupg/** rwklx,
+}

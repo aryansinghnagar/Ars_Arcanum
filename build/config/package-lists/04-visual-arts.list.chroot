@@ -1,0 +1,10 @@
+# 04-visual-arts.list.chroot — Cartography, Heraldry & Graphics
+inkscape
+krita
+gimp
+fontforge
+tiled
+mesa-vulkan-drivers
+mesa-va-drivers
+libgl1-mesa-dri
+xournalpp

@@ -1,0 +1,25 @@
+#!/bin/sh
+# 04-external-binaries.hook.chroot — Typst, novelWriter & External Tools
+
+set -e
+echo "[*] Installing Typst Native Rust Binary & Python Packages..."
+
+# Install novelWriter via pip
+if command -v pip3 >/dev/null 2>&1; then
+  pip3 install --break-system-packages novelwriter || true
+fi
+
+# Fetch and install Typst binary
+if [ ! -f /usr/local/bin/typst ]; then
+  ARCH=$(uname -m)
+  if [ "$ARCH" = "x86_64" ]; then
+    TYPST_URL="https://github.com/typst/typst/releases/latest/download/typst-x86_64-unknown-linux-musl.tar.xz"
+    curl -sSL "$TYPST_URL" | tar -xJ -C /tmp/ || true
+    if [ -f /tmp/typst-x86_64-unknown-linux-musl/typst ]; then
+      mv /tmp/typst-x86_64-unknown-linux-musl/typst /usr/local/bin/typst
+      chmod 755 /usr/local/bin/typst
+    fi
+  fi
+fi
+
+echo "[+] External binaries installed."

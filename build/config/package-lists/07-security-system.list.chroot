@@ -1,0 +1,10 @@
+# 07-security-system.list.chroot — Security Hardening & Confinement
+nftables
+apparmor
+apparmor-utils
+apparmor-profiles
+apparmor-profiles-extra
+usbguard
+borgbackup
+sbctl
+libpam-systemd

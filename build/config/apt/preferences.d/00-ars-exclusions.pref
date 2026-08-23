@@ -1,0 +1,31 @@
+# /etc/apt/preferences.d/00-ars-exclusions.pref
+# Ars Arcanum Structural Anti-Distraction Package Policy
+# Pin Priority -1 completely forbids installation of excluded distractions
+
+Package: chromium* firefox* epiphany-browser* konqueror* midori* surf* qutebrowser* falkon* w3m* lynx* links* dillo*
+Pin: release *
+Pin-Priority: -1
+
+Package: vlc* mpv* mplayer* celluloid* kodi* totem* smplayer* parole* xine-ui*
+Pin: release *
+Pin-Priority: -1
+
+Package: rhythmbox* audacious* clementine* strawberry* deadbeef* lollypop* spotify*
+Pin: release *
+Pin-Priority: -1
+
+Package: steam* retroarch* lutris* minetest* gzdoom* dosbox* supertux* gnome-games*
+Pin: release *
+Pin-Priority: -1
+
+Package: discord* telegram-desktop* slack* pidgin* thunderbird* evolution* mutt* neomutt* hexchat* irssi*
+Pin: release *
+Pin-Priority: -1
+
+Package: tracker* tracker3* baloo-kf5* zeitgeist* packagekit*
+Pin: release *
+Pin-Priority: -1
+
+Package: snapd*
+Pin: release *
+Pin-Priority: -1

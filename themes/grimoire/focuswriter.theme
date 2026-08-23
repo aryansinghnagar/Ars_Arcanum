@@ -1,0 +1,20 @@
+[Theme]
+Name=Grimoire
+Background=#1a1a2e
+Foreground=#f5e6c8
+Paper=#141424
+PaperBorder=#c9a96e
+Cursor=#c9a96e
+Font=EB Garamond,14,-1,5,50,0,0,0,0,0
+MarginHorizontal=120
+MarginVertical=60
+PaddingHorizontal=40
+PaddingVertical=40
+LineWidth=80
+Alignment=0
+LineSpacing=1.4
+ParagraphSpacing=1.0
+IndentSize=20
+MisspelledUnderline=#e63946
+Selection=#4a1942
+SelectionForeground=#f5e6c8

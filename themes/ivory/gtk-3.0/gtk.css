@@ -1,0 +1,40 @@
+/* Ivory — Ars Arcanum GTK 3/4 Theme */
+@define-color theme_bg_color #faf3e0;
+@define-color theme_fg_color #2c1810;
+@define-color theme_base_color #f5ebd0;
+@define-color theme_text_color #2c1810;
+@define-color theme_selected_bg_color #8b7355;
+@define-color theme_selected_fg_color #faf3e0;
+@define-color borders #d2b48c;
+
+window, dialog {
+    background-color: @theme_bg_color;
+    color: @theme_fg_color;
+    font-family: "EB Garamond", "Cinzel", serif;
+}
+
+textview, entry, list, treeview {
+    background-color: @theme_base_color;
+    color: @theme_fg_color;
+    border: 1px solid @borders;
+    border-radius: 4px;
+}
+
+button {
+    background-color: #e8dcc8;
+    color: #2c1810;
+    border: 1px solid #8b7355;
+    border-radius: 4px;
+    padding: 6px 14px;
+    font-weight: bold;
+}
+
+button:hover {
+    background-color: #8b7355;
+    color: #faf3e0;
+}
+
+headerbar {
+    background-color: #ede2cb;
+    border-bottom: 2px solid #8b7355;
+}

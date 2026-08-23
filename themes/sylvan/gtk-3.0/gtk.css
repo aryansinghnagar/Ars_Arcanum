@@ -1,0 +1,40 @@
+/* Sylvan — Ars Arcanum GTK 3/4 Theme */
+@define-color theme_bg_color #1b2d1b;
+@define-color theme_fg_color #f0ead6;
+@define-color theme_base_color #121f12;
+@define-color theme_text_color #f0ead6;
+@define-color theme_selected_bg_color #d4a017;
+@define-color theme_selected_fg_color #1b2d1b;
+@define-color borders #2d4a2d;
+
+window, dialog {
+    background-color: @theme_bg_color;
+    color: @theme_fg_color;
+    font-family: "EB Garamond", "Libertinus Serif", serif;
+}
+
+textview, entry, list, treeview {
+    background-color: @theme_base_color;
+    color: @theme_fg_color;
+    border: 1px solid @borders;
+    border-radius: 4px;
+}
+
+button {
+    background-color: #3e2723;
+    color: #f0ead6;
+    border: 1px solid #d4a017;
+    border-radius: 4px;
+    padding: 6px 14px;
+    font-weight: bold;
+}
+
+button:hover {
+    background-color: #d4a017;
+    color: #1b2d1b;
+}
+
+headerbar {
+    background-color: #0e170e;
+    border-bottom: 2px solid #d4a017;
+}

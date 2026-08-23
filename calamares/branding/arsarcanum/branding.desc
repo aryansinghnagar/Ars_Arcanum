@@ -1,0 +1,29 @@
+# Ars Arcanum Calamares Branding Descriptor
+---
+componentName:  arsarcanum
+welcomeStyleCalamares: false
+welcomeExpandingLogo: true
+windowExpanding: normal
+windowSize: 850px,600px
+windowPlacement: center
+
+strings:
+    productName:         Ars Arcanum
+    shortProductName:    ArsArcanum
+    version:             3.0 (Trixie)
+    shortVersion:        3.0
+    versionedName:       Ars Arcanum 3.0
+    shortVersionedName:  ArsArcanum 3.0
+    bootloaderEntryName: Ars Arcanum
+    productUrl:          https://ars-arcanum.local
+    supportUrl:          https://ars-arcanum.local/support
+
+images:
+    productLogo:         "logo.png"
+    productIcon:         "icon.png"
+    productWelcome:      "welcome.png"
+
+style:
+   SidebarBackground:    "#111122"
+   SidebarTextColor:     "#f5e6c8"
+   SidebarTextHighlight: "#c9a96e"

@@ -1,0 +1,7 @@
+# /etc/udev/rules.d/99-no-automount.rules — Ars Arcanum USB Security Policy
+# Prevents unauthorized automatic mounting of external block devices (USBs/external drives)
+# Mounting requires explicit user authorization via ars-mount GUI
+
+ENV{UDISKS_AUTO}="0"
+ENV{UDISKS_IGNORE}="1"
+SUBSYSTEM=="block", ENV{ID_FS_USAGE}=="filesystem", ENV{UDISKS_AUTO}="0"

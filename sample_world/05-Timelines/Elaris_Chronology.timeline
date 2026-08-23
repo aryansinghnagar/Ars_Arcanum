@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<timeline>
+  <version>2.0.0</version>
+  <categories>
+    <category>
+      <name>Dynastic History</name>
+      <color>201,169,110</color>
+      <font_color>26,26,46</font_color>
+    </category>
+    <category>
+      <name>Cataclysms &amp; Wars</name>
+      <color>74,25,66</color>
+      <font_color>245,230,200</font_color>
+    </category>
+  </categories>
+  <events>
+    <event>
+      <start>0642-01-01 00:00:00</start>
+      <end>0642-01-01 00:00:00</end>
+      <text>Founding of the Citadel of Ash by High King Valdane I</text>
+      <category>Dynastic History</category>
+      <description>The primordial basalt fortress is carved into Mount Ignis.</description>
+    </event>
+    <event>
+      <start>0750-06-12 00:00:00</start>
+      <end>0750-06-12 00:00:00</end>
+      <text>The Cataclysm of Twin Suns</text>
+      <category>Cataclysms &amp; Wars</category>
+      <description>Planetary alignment shatters the eastern continent and awakens the geothermal hearths.</description>
+    </event>
+    <event>
+      <start>0842-10-14 00:00:00</start>
+      <end>0842-10-15 00:00:00</end>
+      <text>The Solar Ascendancy Marches on Sunstone Pass</text>
+      <category>Cataclysms &amp; Wars</category>
+      <description>Prelate Aurelia Sol delivers the Imperial ultimatum to Lord Raymond Vael.</description>
+    </event>
+  </events>
+</timeline>

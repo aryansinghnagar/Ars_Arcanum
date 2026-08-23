@@ -1,0 +1,36 @@
+#!/usr/sbin/nft -f
+# Ars Arcanum Paranoid Mode Firewall Configuration
+# Drops all unsolicited inbound and outbound network traffic.
+# Outbound exceptions: UID _apt & root for ports 80/443 (Debian/Flathub), NTP (123), Loopback.
+
+flush ruleset
+
+table inet filter {
+    chain input {
+        type filter hook input priority 0; policy drop;
+        ct state established,related accept
+        iif "lo" accept
+        icmp type { destination-unreachable, time-exceeded, parameter-problem } accept
+        icmpv6 type { destination-unreachable, time-exceeded, packet-too-big, parameter-problem, nd-router-advert, nd-neighbor-solicit, nd-neighbor-advert } accept
+    }
+
+    chain forward {
+        type filter hook forward priority 0; policy drop;
+    }
+
+    chain output {
+        type filter hook output priority 0; policy drop;
+        oif "lo" accept
+        ct state established,related accept
+
+        # Allow Debian package manager and root updates
+        meta skuid _apt tcp dport { 80, 443 } accept
+        meta skuid root tcp dport { 80, 443 } accept
+
+        # Allow system clock synchronization via NTP
+        udp dport 123 accept
+
+        # Reject all other outbound traffic with ICMP admin prohibited
+        reject with icmpx type admin-prohibited
+    }
+}

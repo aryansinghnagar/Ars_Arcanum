@@ -1,0 +1,24 @@
+# AppArmor profile for novelWriter in Ars Arcanum
+
+abi <abi/3.0>,
+include <tunables/global>
+
+profile novelwriter /usr/bin/novelwriter /usr/local/bin/novelwriter {
+  include <abstractions/base>
+  include <abstractions/fonts>
+  include <abstractions/python>
+  include <abstractions/X>
+  include <abstractions/freedesktop.org>
+
+  # Network restriction: novelWriter operates 100% locally
+  deny network inet,
+  deny network inet6,
+
+  owner @{HOME}/Worlds/** rwkl,
+  owner @{HOME}/.config/novelWriter/** rwkl,
+  owner @{HOME}/.cache/novelWriter/** rwkl,
+  /tmp/** rwkl,
+
+  deny @{HOME}/.ssh/** rwklx,
+  deny @{HOME}/.gnupg/** rwklx,
+}

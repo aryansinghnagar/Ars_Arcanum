@@ -1,0 +1,14 @@
+/* Grimoire Obsidian Theme Snippet */
+.theme-dark, .theme-light {
+  --background-primary: #1a1a2e !important;
+  --background-secondary: #141424 !important;
+  --background-secondary-alt: #22223a !important;
+  --text-normal: #f5e6c8 !important;
+  --text-accent: #c9a96e !important;
+  --interactive-accent: #c9a96e !important;
+  --text-muted: #8a7e6b !important;
+  --font-family-editor: "EB Garamond", "Libertinus Serif", serif;
+  --font-family-preview: "EB Garamond", "Libertinus Serif", serif;
+  --h1-color: #c9a96e !important;
+  --h2-color: #e0d5c0 !important;
+}

@@ -1,0 +1,15 @@
+#!/bin/sh
+# 06-skel-world-scaffold.hook.chroot — Pre-install Elaris Reference World to Skeleton
+
+set -e
+echo "[*] Populating /etc/skel with World of Elaris and Template Packs..."
+
+mkdir -p /etc/skel/Worlds/Elaris
+mkdir -p /etc/skel/Documents
+mkdir -p /etc/skel/.config/ars-arcanum
+
+# Set default active world and theme in skeleton
+echo "Elaris" > /etc/skel/.config/ars-arcanum/active_world.txt
+echo "grimoire" > /etc/skel/.config/ars-arcanum/active_theme.txt
+
+echo "[+] User skeleton populated."

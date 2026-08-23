@@ -1,0 +1,893 @@
+# Ars Arcanum — Complete Design \& Build Specification
+
+## A Custom Linux Distribution for Speculative Fiction Authors \& Worldbuilders
+
+> \*"The Art of Secrets"\* — A purpose-built, distraction-free, beginner-accessible Linux workstation for the complete lifecycle of fantasy and science fiction worldbuilding and long-form prose composition.
+
+\---
+
+## 1\. Identity \& Foundational Directives
+
+### 1.1 Core Identity
+
+* **Name**: Ars Arcanum
+* **Tagline**: *The Writer's Forge. The Worldbuilder's OS.*
+* **Classification**: Dedicated Creative Workstation \& Hardened Appliance
+* **Purpose**: A single-purpose operating system engineered for six core creative arcs — **Brainstorming**, **Outlining**, **Drafting**, **Revising**, **Visual Creation** (cartography, heraldry, concept art), and **Publication** (typesetting, ebook production) — plus the supporting infrastructure of **Linguistic Construction**, **Genealogical Tracking**, and **Lore Consistency Management**.
+
+### 1.2 Five Foundational Directives
+
+1. **The Machine Is an Instrument, Not an Environment**: Every kernel parameter, daemon, and UI element exists strictly to serve fiction and worldbuilding. Components unrelated to the creative workflow are omitted.
+2. **Distraction Elimination by Construction, Not Willpower**: Distractions are eliminated at the package, service, and kernel packet-filtering layers. There is no web browser, no video playback engine, no social client, and no unsolicited background notification. The OS structurally prevents casual web browsing.
+3. **Vault-Grade Data Security**: Unpublished manuscripts, world bibles, and original concept art are irreplaceable intellectual property. Full-disk LUKS2 encryption (Argon2id KDF), kernel hardening, AppArmor mandatory access control, and `nftables` network containment ensure data integrity. Advanced hardware security (Secure Boot, USBGuard) is available as an opt-in upgrade.
+4. **Open Formats \& Zero Vendor Lock-In**: All narrative data is stored in human-readable open formats (Markdown with YAML frontmatter, plain text, SVG, PNG, OpenDocument, Typst markup, XML/JSON) organized in a transparent filesystem hierarchy versioned with local Git. Creative work must outlive software companies.
+5. **Unified Toolchain Cohesion**: Specialized tools do not operate in silos. They share standardized schemas, symlinked project directories, cross-tool hotkeys, automated compilation pipelines, and continuity linting utilities to form a single integrated creative ecosystem.
+
+### 1.3 Beginner Accessibility Mandate
+
+> \[!IMPORTANT]
+> Ars Arcanum must be usable by individuals with \*\*basic computer knowledge and zero prior Linux experience\*\*. Every system function — from installation to daily writing to backups — must have a \*\*graphical interface as the primary interaction path\*\*, with CLI available as a power-user fallback. No workflow step should require terminal usage unless the user actively chooses it.
+
+\---
+
+## 2\. Target Hardware \& Performance Budget
+
+### 2.1 Reference Hardware (`The-Garden-Of-Words`)
+
+|Component|Specification|
+|-|-|
+|**Processor**|13th Gen Intel® Core™ i5-1335U (2P+8E cores, 12 threads, up to 4.60 GHz, 12 MB cache)|
+|**Memory**|16.0 GB DDR4/DDR5 (15.6 GB addressable)|
+|**Graphics**|Intel® Iris® Xe Graphics (hardware OpenGL/Vulkan for Krita canvas, Inkscape rendering, Typst compilation)|
+|**Storage**|477 GB NVMe SSD (\~200 GB free, available for Ars Arcanum in dual-boot with Windows)|
+|**Display**|1920×1080 Full HD, 60 Hz, non-touch (100% integer scaling, subpixel font rendering)|
+
+### 2.2 Performance Targets
+
+|Metric|Target|Mechanism|
+|-|-|-|
+|Cold boot to working desktop|≤ 10 seconds|Stripped systemd, minimal critical-path services|
+|Idle RAM footprint|≤ 420 MB|Lightweight XFCE session, zero background indexing|
+|Drafting app launch|≤ 1.2 seconds|Native Qt6/C++ binaries, warm page cache|
+|Krita canvas responsiveness|60 FPS|Hardware-accelerated OpenGL via Intel Iris Xe Mesa drivers|
+|Typst compilation (150k words)|≤ 250 ms|Rust native binary with incremental caching|
+|Base OS disk footprint|≤ 6.5 GB|Curated Debian package manifest (excl. optional ZIM archives)|
+
+### 2.3 Dual-Boot Deployment
+
+Ars Arcanum is designed to **coexist with an existing Windows (or other OS) installation**:
+
+* The Calamares installer offers **'Install alongside existing OS'** as a first-class option.
+* Recommended Ars Arcanum partition: **80–120 GB** (root + home + swap via zram).
+* GRUB bootloader auto-detects Windows/other OS entries via `os-prober`.
+* The prompt includes guidance for the installer to preserve existing EFI System Partitions.
+
+\---
+
+## 3\. Base System Architecture
+
+### 3.1 Operating System Layer
+
+* **Base**: Debian GNU/Linux 13 (Trixie) Stable — minimal base installation.
+* **Kernel**: `linux-image-amd64` with custom sysctl hardening profile.
+* **Init**: systemd (minimal profile; non-essential targets masked).
+* **Display Server (Primary)**: X11 (Xorg) — guarantees flawless graphics tablet input, Krita color profiles, and global hotkey compatibility.
+* **Display Server (Alternative)**: labwc (wlroots-based Wayland compositor) — available as a LightDM login dropdown for users who prefer a sub-150 MB tiling/stacking session. Includes `waybar`, `mako`, `foot`, `swaylock`.
+* **Login Manager**: LightDM with `lightdm-gtk-greeter` (themed to match active Ars Arcanum theme). X11 is the default session; labwc selectable from dropdown.
+
+### 3.2 Desktop Shell (X11 Primary)
+
+* **Desktop Environment**: XFCE 4.18+ with a custom minimalist layout.
+
+  * Panel stripped to: Clock, battery indicator, focus mode status (padlock icon), network firewall status indicator, and notification area.
+  * Compositor: `xfwm4` (compositing for tear-free display only; shadows, blur, and desktop animations disabled).
+* **Application Launcher**: **Rofi** — themed to match active color preset. Invoked via `Super+Space`. Entries organized by workflow phase (Brainstorm → Outline → Draft → Create → Publish → Tools → System).
+* **File Manager**: **Thunar** — configured with custom action scripts for manuscript compilation, Git snapshotting, and map exports.
+* **Notification Daemon**: **dunst** — fully scriptable, with pause/resume hooks for Focus modes.
+* **Terminal Emulator**: **xfce4-terminal** (X11) / **foot** (Wayland) — themed with matching palette, tabbed, low latency.
+
+### 3.3 Architectural Exclusions
+
+> \[!CAUTION]
+> The following components are \*\*permanently excluded\*\* from the OS image. This is enforced at the package manifest level — they cannot be accidentally installed.
+
+|Excluded Category|Examples|
+|-|-|
+|Web Browsers|Chromium, Firefox, Epiphany, any WebKit wrapper|
+|Video Playback|VLC, mpv (video mode), GStreamer playback decoders, streaming libraries|
+|Entertainment Audio|Rhythmbox, Audacious, Spotify (ambient soundscapes handled by **Blanket** only)|
+|Games \& Emulators|Steam, game engines, emulators|
+|Messaging \& Social|Discord, Slack, Telegram, Matrix, email clients|
+|AI/LLM Features|No Copilot, no local LLM runtimes, no generative AI. Creativity remains 100% human.|
+|Background Indexers|Tracker, Baloo, Zeitgeist, PackageKit auto-refresh|
+|Snap Daemon|`snapd` completely masked and purged|
+
+\---
+
+## 4\. Security Architecture
+
+### 4.1 Always-Active Security Layers
+
+These security measures are **always enabled** regardless of user choices:
+
+#### 4.1.1 Full-Disk Encryption (LUKS2)
+
+* **Default ON** during Calamares installation (user sets passphrase; can opt-out via checkbox).
+* KDF: `argon2id` — memory-hard, defeats GPU/ASIC dictionary attacks.
+* Partition layout: Single encrypted container housing root, home, and swap (swap via compressed `zram` to prevent plaintext RAM pages on SSD).
+
+#### 4.1.2 Kernel Hardening (`sysctl`)
+
+Applied via `/etc/sysctl.d/99-ars-security.conf`:
+
+* Kernel pointer restriction (`kptr\_restrict = 2`)
+* dmesg restriction, ptrace scope lockdown, BPF hardening
+* ICMP redirect rejection, symlink/hardlink protection
+* Unprivileged user namespace cloning disabled
+
+#### 4.1.3 Mandatory Access Control (AppArmor)
+
+* Every installed application runs under an enforced AppArmor profile.
+* Applications are granted read-write access **only** to project directories (`\~/Worlds/\*\*`).
+* Applications are explicitly **denied network socket creation** (`deny network inet, deny network inet6`).
+* Applications cannot read system config, SSH keys, or other app caches.
+
+#### 4.1.4 Network Firewall (`nftables`)
+
+The user selects a firewall mode during installation:
+
+**Paranoid Mode** *(recommended for writers with sensitive manuscripts)*:
+
+* Default inbound policy: `DROP` all.
+* Default outbound policy: `DROP` all.
+* Outbound exception: Only `\_apt` and `root` UIDs may create sockets, restricted to ports 80/443 (Debian + Flathub mirrors) and NTP port 123.
+* Local loopback (`lo`) permitted for `dictd`, Kiwix, and inter-tool communication.
+* Maintenance unlocking via `ars-update` (GUI) for package upgrades.
+
+**Standard Mode** *(relaxed, closer to normal desktop behavior)*:
+
+* Default inbound policy: `DROP` all.
+* Default outbound policy: `ACCEPT` — normal internet access available.
+* No browser is installed regardless, so web browsing remains impossible.
+
+Both modes include:
+
+* **Airplane Mode**: Complete network interface shutdown (`ip link set down`), toggleable from system tray.
+* **Firewall status indicator** in XFCE panel (padlock icon: green = Paranoid, blue = Standard, red = Airplane).
+
+### 4.2 Opt-In Advanced Security
+
+Available as a Calamares checkbox **"Enable Advanced Hardware Security"** (default OFF):
+
+* **Secure Boot**: `sbctl` enrolls personal keys, signs bootloader + unified kernel image + initramfs.
+* **USBGuard**: Strict allowlist for USB devices. Pre-authorized device classes: HID keyboards, HID mice, mass storage. Unknown devices rejected until authorized via `ars-mount` (GUI).
+* **USB Automount Disabled**: Udev rule `99-no-automount.rules` prevents auto-mounting external block devices.
+
+\---
+
+## 5\. Creative Toolset — Organized by Workflow Phase
+
+> \[!NOTE]
+> All tools are presented during the \*\*ars-wizard first-boot setup\*\*, grouped by workflow phase. Recommended tools are pre-selected. The user can deselect tools they don't need — deselected tools are not installed but remain available via `ars-extensions` for later one-click installation.
+
+### 5.1 Phase 1: Brainstorm, Research \& Lore Repository
+
+|Tool|Role|License|Notes|
+|-|-|-|-|
+|**Obsidian**|Connected-notes knowledge base, world bible, graph visualizer|Proprietary (free personal use)|Flatpak, network-denied via `--nosocket=network`. Pre-configured with Kanban, Dataview, Writing Goals, Templater, Excalidraw plugins. **Single FOSS exception.**|
+|**Fantasia Archive**|Structured worldbuilding database (characters, locations, factions, artifacts)|Open Source|Offline entity management|
+|**Kiwix Reader**|Offline ZIM archive reader (Wikipedia, Wiktionary, Project Gutenberg)|GPL-3.0|\~48 GB optional ZIM archives|
+|**Xournal++**|PDF annotation, handwritten lore sketches, margin markup|GPL-2.0+|Mouse or stylus input|
+|**Anki**|Spaced-repetition engine for memorizing own lore, conlang vocabulary, timelines|AGPL-3.0|Fully offline|
+
+*Available via ars-extensions*: Zim Desktop Wiki (ultra-lightweight plain-text alternative to Obsidian).
+
+### 5.2 Phase 2: Outline, Structure \& Narrative Logic
+
+|Tool|Role|License|Notes|
+|-|-|-|-|
+|**Manuskript**|Novel planner: Snowflake method, scene cards, plot arcs, character matrices|GPL-3.0|Python/Qt|
+|**novelWriter**|Markdown-based novel organizer: scene synopses, character cross-refs, dialogue analysis|GPL-3.0|Qt6, also serves as drafting tool|
+|**Bibisco** (Community Ed.)|Character psychology interviews, structural narrative tool|GPL-3.0|Java-based|
+|**The Timeline Project**|Interactive chronological tracker with custom calendar systems|GPL-3.0|Supports parallel character arcs|
+|**Gramps**|Genealogy software repurposed for fictional dynasties and bloodlines|GPL-2.0+|Multi-generational trees|
+|**draw.io Desktop**|Offline diagrammer for alliance matrices, magic flowcharts, tech trees|Apache-2.0|Flatpak/AppImage, replaces legacy `dia`|
+
+### 5.3 Phase 3: Draft \& Prose Composition
+
+|Tool|Role|License|Notes|
+|-|-|-|-|
+|**FocusWriter**|Fullscreen distraction-free drafting with parchment themes \& word count goals|GPL-3.0|Primary Extreme Focus kiosk target|
+|**novelWriter**|(Cross-listed) Structured drafting with project management|GPL-3.0|Also handles outlining|
+|**LibreOffice Writer**|Formal manuscript revision, tracked changes, `.docx` agent exchange|MPL-2.0|Industrial-grade word processor|
+|**ghostwriter**|Lightweight clean Markdown editor for short stories \& companion lore|GPL-3.0|Minimal, fast|
+|**Blanket**|FOSS ambient soundscape player|GPL-3.0|Flatpak, network-denied. Pre-configured profiles: *Medieval Study*, *Starship Bridge*, *Forest Sanctuary*, *Stormy Keep*|
+
+### 5.4 Phase 4: Cartography, Heraldry \& Visual Arts
+
+|Tool|Role|License|Notes|
+|-|-|-|-|
+|**Inkscape**|Vector graphics: heraldry, sigils, cartography symbols, book covers|GPL-3.0|Professional SVG editor|
+|**Krita**|Digital painting: concept art, map painting, illustration|GPL-3.0|OpenGL-accelerated canvas, fantasy brush packs pre-loaded|
+|**Azgaar's Fantasy Map Generator**|Procedural world generator: heightmaps, biomes, borders, trade routes|MIT|Offline WebView wrapper (bundled HTML/JS assets, no internet)|
+|**Nortantis**|Tectonic plate simulation for realistic continent generation|GPL-3.0|Java-based, sandboxed JVM|
+|**Tiled Map Editor**|Grid/tile editor for battle maps, city floorplans, dungeons|GPL-2.0+|XML/JSON exports|
+|**GIMP**|Raster editing: texture processing, batch image optimization|GPL-3.0|High-resolution support|
+|**QGIS**|Professional GIS for scientifically grounded worldbuilders|GPL-2.0+|Climate zones, elevation contours, continental curvature|
+
+### 5.5 Phase 5: Linguistic Laboratory \& Reference
+
+|Tool|Role|License|Notes|
+|-|-|-|-|
+|**PolyGlot**|Conlang toolkit: lexicon database, phonology, declension/conjugation engines|GPL-3.0|IPA support|
+|**SIL FLEx**|Enterprise-grade linguistic analysis, morpheme parsing, interlinear glossing|MIT|Deep lexical analysis|
+|**FontForge**|Custom font creation: runic glyphs, alien scripts, Tengwar-style fonts|GPL-3.0|Maps to Unicode PUA, auto-installs to `\~/.local/share/fonts/`|
+|**GoldenDict-ng**|Universal offline dictionary frontend (StarDict, MDX, Babylon)|GPL-3.0|Global hotkey popup: `Super+G`|
+|**Artha**|Offline thesaurus (WordNet): synonyms, antonyms, hypernyms|GPL-2.0|Instant lookup: `Ctrl+Alt+W`|
+|**dictd + sdcv**|CLI dictionary daemon and terminal lookup|GPL|Fast command-line reference|
+|**Bundled Databases**|GCIDE (1913 Webster's), Moby Thesaurus II (30k roots), WordNet 3.1, Wiktionary extract|Various FOSS|Pre-installed offline|
+
+### 5.6 Phase 6: Publishing, Typesetting \& Ebook Press
+
+|Tool|Role|License|Notes|
+|-|-|-|-|
+|**Typst**|Ultra-fast markup typesetting: print-ready PDFs in milliseconds|Apache-2.0|Rust binary, incremental compilation, microtypography, drop caps|
+|**Pandoc**|Universal document conversion: MD → Typst, EPUB 3, DOCX, PDF|GPL-3.0|CLI with GUI wrapper via ars-compile|
+|**Scribus**|Desktop publishing: book covers, dust jackets, illustrated layouts|GPL-2.0+|Fixed-layout special editions|
+|**Sigil**|EPUB 3 editor: CSS fine-tuning, metadata, KDP/Apple Books validation|GPL-3.0|Dedicated ebook polisher|
+|**Calibre**|Ebook library manager, format converter (MOBI/AZW3/EPUB)|GPL-3.0|Offline configuration|
+|**Bundled Typefaces**|Libertinus Serif, EB Garamond, Cinzel, Cormorant Garamond, Lato, Fira Code, Noto Serif|OFL/Apache|Professional book typography|
+
+### 5.7 Phase 7: Task, Goal \& Momentum Engine
+
+|Tool|Role|License|Notes|
+|-|-|-|-|
+|**Taskwarrior**|CLI task manager with urgency algorithms and deadline tracking|MIT|Power-user backbone|
+|**Timewarrior**|Writing session time tracking|MIT|Integrates with Focus modes|
+|**taskwarrior-tui**|Terminal UI frontend for Taskwarrior|MIT|Visual task browsing|
+|**Super Productivity**|Visual Kanban board with Pomodoro timers, habit tracking, session logs|MIT|Beginner-friendly GUI dashboard|
+
+\---
+
+## 6\. Worldbuilder Template Packs
+
+During `ars-wizard` world creation, users select which **Author Methodology Template Packs** to apply. Each pack installs a set of Obsidian templates, Markdown schemas, and `ars-\*` script configurations tailored to a specific worldbuilding philosophy.
+
+### 6.1 Hard Magic System Builder *(Sandersonian)*
+
+*Modeled on Brandon Sanderson's Laws of Magic and Peter/Karen Ahlstrom's Cosmere Continuity Engine.*
+
+* **Magic System Constraint Matrix**: Templates structured around Sanderson's Three Laws — costs, limitations, and failure modes given equal prominence to abilities.
+* **Cosmic Chronology Sync**: Timeline integration across planetary systems with differing calendars and epoch offsets.
+* **Terminology Linter**: `ars-audit` configuration for scanning manuscripts to enforce consistent magic vocabulary, character name spellings, and in-world terminology.
+
+### 6.2 Dynastic Realism Pack *(Martinian)*
+
+*Modeled on George R.R. Martin's Westeros Cartography and Elio García/Linda Antonsson's Continuity Lore.*
+
+* **Travel-Time \& Distance Engine**: `ars-travel` configured with medieval velocity tables (infantry, cavalry, sailing galley, terrain friction coefficients). Prevents narrative "teleportation."
+* **Heraldic \& Dynastic Lineage**: Inkscape heraldry templates + Gramps multi-generational family trees with phenotypic inheritance tracking (eye color, hair, magical bloodlines).
+* **POV Chapter Matrix**: Templates for tracking simultaneous timeline events across multiple viewpoint characters.
+
+### 6.3 Epic Scale Lore Manager *(Jordanian)*
+
+*Modeled on Robert Jordan's 2-million-word Wheel of Time world notes.*
+
+* **Power Level \& Tier Matrices**: Standardized ranking tables (LibreOffice Calc + Obsidian Dataview) for channelers, military factions, and capability scales.
+* **Astronomical \& Lunar Phase Cycles**: Custom calendar integration in Timeline Project for lunar cycles, season shifts, and weather patterns.
+* **Living Glossary Generator**: Automated appendix compilation of character names, factions, and pronunciation keys for print and digital editions.
+
+### 6.4 Non-Linear Narrative Engine *(Nagatsukian)*
+
+*Modeled on Tappei Nagatsuki's Re:Zero narrative structure.*
+
+* **Branching Timeline \& Loop Engine**: `ars-loop` schema for time-loop, alternate reality, and multi-timeline fiction.
+
+  * Tracks character knowledge states per loop iteration (*Who knows what secret at Loop #3?*).
+  * Checkpoint state recording (inventory, injuries, emotional trauma, relational trust levels per iteration).
+  * Graph-based branching and pruning visualizer in draw.io.
+
+### 6.5 Living World Ecology *(Falcom-Grade)*
+
+*Modeled on Nihon Falcom's Trails (Kiseki) Zemurian World Bible.*
+
+* **NPC Schedule \& Dialogue Evolution**: Track NPC locations, allegiances, and behavioral changes across story beats.
+* **Geopolitical Faction \& Treaty Trackers**: Dynamic relationship charts — peace accords, trade embargoes, military alliances, corporate monopolies.
+* **Technological \& Cultural Era Progression**: Document pre-industrial, magical, and scientific revolutions across decades of fictional history.
+
+\---
+
+## 7\. The `ars-\*` Tool Suite
+
+Every `ars-\*` tool has **two interfaces**:
+
+1. **GUI (Primary)**: A GTK/zenity dialog or a button in the Welcome App. Accessible from the desktop menu, system tray, or keyboard shortcut. No terminal knowledge required.
+2. **CLI (Power User)**: The underlying POSIX shell or Python 3 script in `/usr/local/bin/`. Full command-line flags for scripting and automation.
+
+### 7.1 Tool Inventory
+
+|Tool|CLI Command|GUI Access|Function|
+|-|-|-|-|
+|**Focus Controller**|`ars-focus \[dnd\|extreme\|off]`|System tray toggle + `Super+F` / `Super+Shift+F`|Coordinates dunst, compositor kiosk mode, audio mutes, and Timewarrior session clocks|
+|**Git Auto-Snapshot**|`ars-snapshot`|Welcome App → Quick Actions → "Snapshot" / `Super+S`|Commits timestamped diffs across all active world repositories|
+|**Universal Compiler**|`ars-compile \[novel\|epub\|clean]`|Desktop icon "Compile Book" → project selector dialog|Converts drafts into Typst print PDFs, EPUB 3, or DOCX via Pandoc|
+|**Continuity Auditor**|`ars-audit \[project-dir]`|Welcome App → Quick Actions → "Audit Lore"|Scans manuscripts for character name drifts, inconsistent attributes, broken lore links|
+|**Travel Calculator**|`ars-travel \[distance] \[terrain]`|Welcome App → Tools → "Travel Calculator"|Medieval/sci-fi transit time calculator for realistic character movement|
+|**Loop Tracker**|`ars-loop \[world-dir]`|Welcome App → Tools → "Loop Tracker"|Visualizes character knowledge consistency across non-linear narratives|
+|**Secure USB Mount**|`ars-mount`|System tray notification on USB insertion|Safely mounts authorized USB drives with USBGuard verification|
+|**Extension Manager**|`ars-extensions`|Welcome App → System → "Manage Extensions"|One-click install/remove of Extended and Specialist tool tiers|
+|**Maintenance Updater**|`ars-update`|Welcome App → System → "Update OS"|Creates Btrfs snapshot, temporarily opens firewall (if Paranoid mode), updates packages, relocks|
+|**World Wizard**|`ars-wizard`|First-boot auto-launch; Welcome App → "Create New World"|Full world project scaffolding with template pack selection|
+|**Theme Switcher**|`ars-theme \[name]`|Welcome App → System → "Change Theme"|Applies theme across XFCE, GTK, Obsidian CSS, FocusWriter, terminal, Rofi|
+|**Help System**|`ars-help`|`F1` from anywhere; Welcome App → "Learn"|Opens offline HTML/Markdown help browser|
+
+\---
+
+## 8\. Ecosystem Interoperability \& Data Pipeline
+
+### 8.1 Universal File Schema (Markdown + YAML Frontmatter)
+
+All text notes, character sheets, and scene drafts adhere to a standardized schema:
+
+```yaml
+---
+title: "The Fall of Valdane"
+type: "scene"       # scene | character | location | lore | timeline | magic
+world: "Aethermoor"
+project: "Book-01"
+chapter: 4
+scene: 2
+pov\_character: "Lord Raymond"
+location: "Citadel of Ash"
+timeline\_date: "4E 842-10-14"
+word\_goal: 2500
+status: "draft"     # outline | draft | revision | final
+tags: \[battle, blood-magic, secret-revealed]
+---
+```
+
+This schema is parsed natively by Obsidian, compiled by novelWriter, ingested by Timeline Project, and converted into Typst formatting variables by `ars-compile`.
+
+### 8.2 Cross-Tool Asset Pipeline
+
+```mermaid
+graph LR
+    subgraph "Brainstorm \& Lore"
+        OB\["Obsidian Vault<br/>(World Bible)"]
+        FA\["Fantasia Archive"]
+    end
+    subgraph "Narrative \& Outlining"
+        OB -- "Markdown Export" --> NW\["novelWriter"]
+        OB -- "Snowflake Expansion" --> MS\["Manuskript"]
+        NW <--> FW\["FocusWriter Sessions"]
+    end
+    subgraph "Visual \& Language Assets"
+        AZ\["Azgaar / Nortantis"] --> KR\["Krita Painting"]
+        KR --> INK\["Inkscape Vector Sigils"]
+        PG\["PolyGlot"] --> FF\["FontForge Custom TTF"]
+    end
+    subgraph "Press \& Typesetting"
+        NW --> PAN\["Pandoc Engine"]
+        PAN --> TYP\["Typst"]
+        INK --> TYP
+        FF --> TYP
+        TYP --> PDF\["Print-Ready PDF"]
+        PAN --> SIG\["Sigil EPUB 3"]
+        SIG --> CAL\["Calibre Archive"]
+    end
+```
+
+**Key Integration Paths**:
+
+1. **Map → World Bible**: Maps from Azgaar/Krita saved to `\~/Worlds/<World>/02-Maps/`, embedded in Obsidian with clickable coordinate annotations.
+2. **Conlang → Typeset Book**: PolyGlot glyphs → FontForge TTF → auto-installed to `\~/.local/share/fonts/` → Typst and LibreOffice render alien/elvish dialogue natively.
+3. **Draft → Final Press**: `ars-compile <Project>` takes novelWriter chapters → injects frontmatter → embeds Inkscape chapter headpieces → compiles via Typst → outputs 300 DPI PDF + validated EPUB 3.
+
+\---
+
+## 9\. Focus System \& Session Architecture
+
+```
+                                      ┌── \[Super+Shift+F] ──► DO NOT DISTURB (DND)
+                                      │                      • Mute notifications (dunstctl pause)
+                                      │                      • Collapse panel to minimal indicator
+                                      │                      • Mute system audio (Blanket remains)
+NORMAL STATE ─────────────────────────┤                      • Keep multi-window workflow
+(Full desktop \& creative toolset)     │
+                                      └── \[Super+F] ────────► EXTREME FOCUS (Deep Work)
+                                                             • Inherit all DND rules
+                                                             • Fullscreen single drafting app (kiosk)
+                                                             • Hide XFCE panels entirely
+                                                             • Start Timewarrior session timer
+                                                             • Lock launcher; require Super+Esc to exit
+```
+
+### 9.1 Do Not Disturb Mode (`Super+Shift+F`)
+
+* Notification suppression via `dunstctl set-paused true`.
+* Panel clock and status items collapsed to a discreet amber dot.
+* System alerts muted; ambient sound from Blanket remains active.
+* Multi-window workflow preserved (e.g., Obsidian + FocusWriter side by side).
+* Toggleable from **system tray** (right-click padlock icon → "Do Not Disturb").
+
+### 9.2 Extreme Focus Mode (`Super+F`)
+
+* Active drafting window maximized to fullscreen kiosk (no borders, no titlebar).
+* XFCE panel completely hidden.
+* Rofi launcher disabled; non-essential hotkeys masked.
+* Timewarrior starts tracking: `timew start "Drafting"`.
+* **Exit Ceremony** (`Super+Escape`):
+
+  1. Prompts for optional session word count note (GUI dialog).
+  2. Stops Timewarrior clock.
+  3. Appends session metrics (timestamp, duration, word count delta) to `\~/Worlds/<World>/09-Backups/session\_logs.md`.
+  4. Triggers `ars-snapshot` auto-commit.
+  5. Restores desktop panel and window geometry.
+
+\---
+
+## 10\. Visual Identity — Five Themes
+
+Shipped with five handcrafted, eye-strain-optimized themes applied consistently across XFCE, GTK, Obsidian CSS, FocusWriter, terminal, Rofi, and LightDM:
+
+|Theme|Genre / Mood|Background|Text|Accent|Secondary|
+|-|-|-|-|-|-|
+|**Grimoire** *(Default)*|Dark Parchment / High Fantasy|`#1a1a2e` Charcoal|`#f5e6c8` Vellum Cream|`#c9a96e` Aged Gold|`#4a1942` Burgundy|
+|**Astral**|Deep Space / Hard Sci-Fi|`#0d1b2a` Void Navy|`#e0e0e0` Starlight|`#7ec8e3` Ice Blue|`#1b0033` Nebula Purple|
+|**Sylvan**|Forest / Elvish Mythos|`#1b2d1b` Moss Green|`#f0ead6` Alabaster|`#d4a017` Amber|`#3e2723` Oak Bark|
+|**Obsidian**|Monastic / Zero Distraction|`#111111` Pitch Black|`#ffffff` Pure White|`#777777` Slate Gray|`#222222` Graphite|
+|**Ivory**|Daylight / Classical Manuscript|`#faf3e0` Warm Cream|`#2c1810` Ink Brown|`#8b7355` Bronze Gold|`#e8dcc8` Parchment|
+
+Theme is selected during first-boot `ars-wizard` and switchable anytime via `ars-theme` (GUI or CLI).
+
+\---
+
+## 11\. Keyboard Shortcut Matrix
+
+|Keybinding|Action|
+|-|-|
+|`Super+Space`|Open **Rofi** workflow launcher|
+|`Super+W`|Open/raise **Obsidian** (World Bible)|
+|`Super+D`|Open/raise **FocusWriter** (Distraction-free drafting)|
+|`Super+N`|Open/raise **novelWriter** (Structured novel drafting)|
+|`Super+M`|Open/raise **Manuskript** (Snowflake outliner)|
+|`Super+K`|Open **Krita** (Digital painting)|
+|`Super+I`|Open **Inkscape** (Vector graphics \& heraldry)|
+|`Super+T`|Open **Timeline Project** (Chronological tracker)|
+|`Super+G`|Open **GoldenDict-ng** dictionary popup|
+|`Ctrl+Alt+W`|Global **Artha** thesaurus lookup on highlighted word|
+|`Super+A`|Toggle **Blanket** ambient soundscapes|
+|`Super+E`|Open **Kiwix** offline encyclopedia|
+|`Super+P`|Open active project directory in **Thunar**|
+|`Super+Enter`|Launch terminal (`xfce4-terminal` / `foot`)|
+|`Super+F`|Engage **Extreme Focus Mode**|
+|`Super+Shift+F`|Toggle **Do Not Disturb Mode**|
+|`Super+Escape`|Exit Extreme Focus (log words, snapshot, restore UI)|
+|`Super+B`|Trigger manual **BorgBackup**|
+|`Super+S`|Trigger manual **Git snapshot** (`ars-snapshot`)|
+|`Super+L`|Lock session immediately|
+|`Super+?`|Display floating keyboard shortcut cheat sheet|
+|`F1`|Open **Ars Arcanum Help System**|
+
+\---
+
+## 12\. Installation \& First-Boot Experience
+
+### 12.1 Installer: Calamares (Graphical)
+
+The ISO boots into a live session with a desktop icon "Install Ars Arcanum" launching Calamares:
+
+1. **Welcome \& Language Selection**
+2. **Timezone \& Locale**
+3. **Partitioning** — Three options:
+
+   * *Install alongside existing OS* (recommended for dual-boot; auto-resizes existing partition)
+   * *Erase disk and install* (single OS; full disk for Ars Arcanum)
+   * *Manual partitioning* (advanced users)
+4. **Encryption** — Checkbox: "Encrypt disk with LUKS2" (default: ON). Passphrase prompt with strength meter.
+5. **Firewall Mode** — Radio buttons:
+
+   * *Paranoid Mode* (recommended for writers with sensitive manuscripts): All outbound blocked except package manager.
+   * *Standard Mode*: Inbound blocked, outbound allowed. No browser installed regardless.
+6. **Advanced Hardware Security** — Checkbox (default: OFF): "Enable Secure Boot key enrollment + USB device allowlisting"
+7. **User Account Creation**
+8. **Installation Progress → Reboot**
+
+### 12.2 First-Boot: `ars-wizard` (World Creation Wizard)
+
+On first login, `ars-wizard` launches — a custom GTK application:
+
+1. **Choose Your Theme**: Visual preview of all 5 themes. Click to select.
+2. **Select Your Tools**: Checkboxes grouped by workflow phase (Brainstorm, Outline, Draft, Create, Publish, Reference, Tasks). Recommended tools pre-selected. User deselects what they don't need. Deselected tools skipped during setup but available via `ars-extensions` later.
+3. **Create Your First World**:
+
+   * Name your world (e.g., "Aethermoor").
+   * Choose genre: Fantasy / Science Fiction / Both / Custom.
+   * Select applicable **Template Packs** (multi-select):
+
+     * ☐ Hard Magic System Builder (Sandersonian)
+     * ☐ Dynastic Realism Pack (Martinian)
+     * ☐ Epic Scale Lore Manager (Jordanian)
+     * ☐ Non-Linear Narrative Engine (Nagatsukian)
+     * ☐ Living World Ecology (Falcom-Grade)
+4. **Scaffold Project Directory** (auto-generated — see §13).
+5. **Quick Keyboard Shortcut Tour**: Interactive overlay highlighting the 5 most important shortcuts.
+6. **Launch Welcome App**.
+
+### 12.3 Welcome App ("The Forge")
+
+Launches on every login (dismissable; re-accessible from menu):
+
+|Tab|Contents|
+|-|-|
+|**Your Worlds**|Clickable list of world projects → opens directly in Obsidian or novelWriter|
+|**Quick Actions**|Start Writing Session, Compile Book, Backup Now, Open Map Editor, Audit Lore, Snapshot|
+|**Learn**|Built-in interactive tutorials: what each tool does, how workflow phases connect, video walkthroughs|
+|**Shortcuts**|Full keyboard shortcut reference (same as `Super+?` overlay)|
+|**System**|Update OS, Manage Extensions, Change Theme, Firewall Status, About|
+
+\---
+
+## 13\. Project Directory Structure
+
+Scaffolded by `ars-wizard` per world:
+
+```
+\~/Worlds/<WorldName>/
+├── 00-World-Bible/                → Obsidian Vault root
+│   ├── Characters/                → Character dossiers, psychological profiles
+│   ├── Locations/                 → Settlements, dungeons, continents, landmarks
+│   ├── Factions-Dynasties/        → Political alliances, noble houses, guilds
+│   ├── Magic-Technology/          → Investiture rules, power tiers, tech trees
+│   ├── Species-Cultures/          → Ethnographies, biology, cultural customs
+│   ├── History-Eras/              → Historical chronicles, major epoch records
+│   ├── Languages-Dialects/        → PolyGlot lexicons, grammar rules, phonetic charts
+│   ├── Religion-Mythology/        → Deities, pantheons, creation myths
+│   ├── Bestiary-Flora/            → Creatures, monsters, botanical lore
+│   ├── Items-Artifacts/           → Relics, enchanted weapons, blueprints
+│   ├── Templates/                 → Pre-built Markdown templates (from selected packs)
+│   └── Session-Notes/             → Daily journals, brainstorm dumps
+├── 01-Manuscripts/                → novelWriter \& Manuskript projects
+│   ├── Book-01/                   → Active novel project
+│   ├── Short-Fiction/             → Standalone stories
+│   └── Outlines/                  → Plot cards, synopses, beats
+├── 02-Maps/                       → Cartographic assets
+│   ├── World-Maps/                → Planetary scale (Azgaar / Nortantis / Krita)
+│   ├── Regional-Maps/             → Kingdom, provincial, topography
+│   ├── City-Battle-Maps/          → Street grids, tactical maps (Tiled)
+│   └── Brushes-Tilesets/          → Fantasy stamps, mountain brushes, textures
+├── 03-Art-Heraldry/               → Visual assets
+│   ├── Character-Portraits/       → Krita .kra files
+│   ├── Heraldry-Sigils/           → Inkscape SVG crests and banners
+│   ├── Custom-Fonts/              → FontForge .sfd + generated TTF/OTF
+│   └── Cover-Designs/             → Scribus layouts, typography proofs
+├── 04-Languages/                  → PolyGlot .pgt \& FLEx databases
+├── 05-Timelines/                  → Timeline Project .timeline XML
+├── 06-Genealogy/                  → Gramps .gramps databases
+├── 07-Publishing/                 → Production press
+│   ├── Typst-Templates/           → Novel, omnibus, worldbook templates
+│   ├── Print-PDF/                 → Generated 300 DPI proofs
+│   └── Digital-EPUB/              → Sigil-edited EPUB 3 manuscripts
+├── 08-Research/                   → Offline reference materials \& clippings
+├── 09-Backups/                    → BorgBackup cache \& session logs
+└── .git/                          → Auto-initialized local Git repository
+```
+
+\---
+
+## 14\. Documentation \& Help Resources
+
+Ars Arcanum ships with **five layers of documentation** to ensure beginners can learn the system without external internet access:
+
+### 14.1 Built-in Help System (`F1`)
+
+An offline HTML/Markdown application accessible via `F1` from any context:
+
+* Quick-start guide for each creative tool.
+* Workflow phase explanations with diagrams.
+* Keyboard shortcut reference.
+* Troubleshooting: USB not mounting, how to update, how to change theme, how to add new tools, how to create a second world.
+
+### 14.2 Contextual Tooltips
+
+Hovering over XFCE panel icons, Rofi launcher entries, `ars-wizard` options, and Welcome App buttons displays 1–2 line explanations of what each tool or action does.
+
+### 14.3 Sample World Project ("World of Elaris")
+
+A pre-installed demo world containing:
+
+* 3 example characters with completed dossiers.
+* 1 regional map (Krita-painted).
+* 1 short manuscript chapter (3 scenes in novelWriter format).
+* Timeline entries spanning 200 years of fictional history.
+* A small conlang vocabulary (12 words in PolyGlot).
+* Heraldry for 2 noble houses (Inkscape SVG).
+
+Demonstrates how all tools interconnect before the user starts their own world.
+
+### 14.4 Video Tutorial Library (\~2 GB, optional)
+
+Pre-recorded screencasts stored locally in `\~/Documents/Ars-Arcanum-Tutorials/`:
+
+* Per-phase workflow walkthroughs (Brainstorm → Draft → Publish pipeline).
+* Individual tool introductions.
+* Focus mode demonstration.
+* Backup and recovery walkthrough.
+
+Installable via `ars-extensions` if not selected during first boot.
+
+### 14.5 Typst-Rendered PDF Manual
+
+A comprehensive, beautifully typeset user guide at `\~/Documents/Ars-Arcanum-Manual.pdf`:
+
+* Full documentation compiled via Typst (demonstrating the typesetting engine's own capabilities).
+* Printable A4/Letter format with table of contents, index, and cross-references.
+* Covers every installed tool, every `ars-\*` command, every shortcut, and every configuration option.
+
+\---
+
+## 15\. Data Protection \& 3-2-1 Backup Strategy
+
+```
+                          ┌── LAYER 1: LOCAL GIT REPOSITORIES (Every Session)
+                          │   • Automatic pre/post session commits via ars-snapshot
+                          │   • Granular file history; zero remote push
+                          │
+DATA REDUNDANCY ──────────┼── LAYER 2: BTRFS SYSTEM SNAPSHOTS (Pre-Update)
+STRATEGY                  │   • Automated pre-transaction hook via ars-update
+                          │   • Instant one-click rollback if update breaks system
+                          │
+                          └── LAYER 3: ENCRYPTED BORGBACKUP (3-2-1 Rule)
+                              • Deduplicated, AES-256 encrypted archive to USB/NAS
+                              • Quarterly restore drill: ars-backup --drill (GUI prompt)
+```
+
+\---
+
+## 16\. Software Licensing Audit
+
+|Application|License|Offline|Confinement|
+|-|-|-|-|
+|Obsidian|Proprietary (free personal)|100% local|Flatpak + AppArmor (`--nosocket=network`)|
+|novelWriter|GPL-3.0|100% local|Native Qt6, AppArmor|
+|FocusWriter|GPL-3.0|100% local|AppArmor, Kiosk display lock|
+|Manuskript|GPL-3.0|100% local|Python/Qt sandbox|
+|LibreOffice|MPL-2.0|100% local|Network blocked|
+|Typst|Apache-2.0|100% local|Rust binary, zero network|
+|Pandoc|GPL-3.0|100% local|CLI user space|
+|Krita|GPL-3.0|100% local|OpenGL accelerated, network denied|
+|Inkscape|GPL-3.0|100% local|AppArmor restricted|
+|Blanket|GPL-3.0|100% local|Flatpak (`--nosocket=network`)|
+|draw.io|Apache-2.0|100% local|Flatpak/AppImage sandboxed|
+|All others|GPL/MIT/BSD/FOSS|100% local|AppArmor or native sandbox|
+
+\---
+
+## 17\. Build Specification (Debian `live-build`)
+
+### 17.1 ISO Build Environment
+
+```bash
+# Execute on a Debian 13 (Trixie) build host
+sudo apt update \&\& sudo apt install -y live-build debootstrap git xorriso calamares calamares-settings-debian
+mkdir -p \~/ars-arcanum-iso \&\& cd \~/ars-arcanum-iso
+
+lb config \\
+  --distribution trixie \\
+  --archive-areas "main contrib non-free non-free-firmware" \\
+  --binary-images iso-hybrid \\
+  --iso-application "Ars Arcanum" \\
+  --iso-publisher "Ars Arcanum Project" \\
+  --iso-volume "ARS\_ARCANUM" \\
+  --memtest none \\
+  --bootappend-live "boot=live components quiet splash security=apparmor apparmor=1 lsm=landlock,lockdown,yama,apparmor,bpf" \\
+  --apt-recommends false
+```
+
+### 17.2 Package Manifest (`config/package-lists/ars-arcanum.list.chroot`)
+
+```
+# Desktop Environment \& Shell
+xfce4 xfce4-goodies xfce4-terminal thunar thunar-archive-plugin
+rofi dunst lightdm lightdm-gtk-greeter
+foot labwc waybar mako swaylock
+
+# Installer
+calamares calamares-settings-debian
+
+# Creative Writing
+focuswriter manuskript libreoffice-writer libreoffice-calc ghostwriter
+
+# Visual Arts \& Cartography
+inkscape krita gimp fontforge tiled
+
+# Typesetting \& Publishing
+scribus pandoc sigil calibre
+fonts-libertinus fonts-ebgaramond fonts-lato fonts-noto
+
+# Linguistics \& Reference
+goldendict-ng artha gramps
+dictd dict-gcide dict-moby-thesaurus dict-wn sdcv
+
+# Productivity
+superproductivity
+
+# Security \& System
+nftables apparmor apparmor-utils apparmor-profiles apparmor-profiles-extra
+cryptsetup btrfs-progs zram-tools git borgbackup
+xdotool wmctrl yad zenity
+python3 python3-pip python3-pyqt6
+rsync htop os-prober
+pipewire pipewire-pulse wireplumber network-manager
+
+# Flatpak Runtime
+flatpak
+```
+
+### 17.3 Flatpak Applications (installed via chroot hook)
+
+```
+md.obsidian.Obsidian          → network-denied (flatpak override --nosocket=network)
+com.rafaelmardojai.Blanket    → network-denied
+io.github.nickvergessen.Tline → network-denied
+com.jgraph.drawio.desktop     → network-denied
+```
+
+### 17.4 External Binaries (installed via chroot hook)
+
+```
+typst           → GitHub releases (Rust static binary → /usr/local/bin/typst)
+novelwriter     → pip install novelwriter (or .deb if available)
+azgaar-fmg      → Bundled offline HTML/JS + WebView wrapper script
+nortantis       → Java JAR + wrapper script (OpenJDK runtime)
+bibisco         → Community edition installer
+fantasia-archive → AppImage or native installer
+```
+
+### 17.5 Post-Bootstrap Hardening Hook (`config/hooks/live/01-hardening.hook.chroot`)
+
+Implements:
+
+1. `nftables` ruleset (Paranoid mode template — switchable at install time)
+2. Kernel sysctl hardening parameters
+3. Service disabling (avahi, ModemManager, cups-browsed, bluetooth)
+4. AppArmor profile installation for all creative applications
+5. Flatpak installation and network override for sandboxed apps
+6. Typst binary installation
+7. `ars-\*` script installation to `/usr/local/bin/`
+8. Default theme installation (Grimoire)
+9. LightDM/XFCE configuration
+10. Sample world project ("Elaris") installation to `/etc/skel/Worlds/`
+
+\---
+
+## 18\. Execution \& Verification Roadmap
+
+### Phase 0: Design Freeze
+
+* Confirm this specification with the author.
+* Initialize versioned build repository (`ars-arcanum-build`).
+
+### Phase 1: VM Prototyping (QEMU/KVM)
+
+* Build minimal ISO with Calamares, XFCE, core tools.
+* Test nftables lockdown (both Paranoid and Standard modes).
+* Verify end-to-end pipeline: FocusWriter → novelWriter → Typst → PDF.
+* Test dual-boot Calamares installation alongside Windows.
+
+### Phase 2: Security \& Confinement
+
+* Implement and test AppArmor profiles for all applications.
+* Test Secure Boot enrollment (opt-in path).
+* Audit with Lynis: verify zero background indexers or listening ports.
+
+### Phase 3: UX \& Beginner Friendliness
+
+* Test ars-wizard flow with a non-technical user.
+* Verify all GUI wrappers for ars-\* tools function without terminal.
+* Test Welcome App, Help System (F1), and contextual tooltips.
+* Validate sample world project (Elaris) completeness.
+
+### Phase 4: Hardware Deployment
+
+* Deploy ISO to The-Garden-Of-Words via USB.
+* Verify Intel Iris Xe OpenGL acceleration (Krita canvas, Inkscape rendering).
+* Execute 14-day distraction-free writing trial.
+* Perform BorgBackup restore drill.
+
+\---
+
+> \*"The forge is cold until the sparks ignite. With Ars Arcanum, the words alone command the world."\*
+
+\---
+
+## Appendix A: Reference Implementation — `ars-audit` (Continuity Linter)
+
+```python
+#!/usr/bin/env python3
+# /usr/local/bin/ars-audit — Ars Arcanum Consistency \& Lore Linter
+import sys, re, os, glob
+
+def audit\_manuscript(world\_dir):
+    print(f"\[\*] Auditing World Repository: {world\_dir}")
+    lore\_files = glob.glob(f"{world\_dir}/00-World-Bible/\*\*/\*.md", recursive=True)
+    manuscript\_files = glob.glob(f"{world\_dir}/01-Manuscripts/\*\*/\*.md", recursive=True)
+
+    # Extract known entities and attributes from lore sheets
+    entities = {}
+    for lf in lore\_files:
+        name = os.path.splitext(os.path.basename(lf))\[0]
+        with open(lf, 'r', errors='ignore') as f:
+            content = f.read()
+            eye\_match = re.search(r'eyes?:\\s\*(\[A-Za-z]+)', content, re.I)
+            hair\_match = re.search(r'hair:\\s\*(\[A-Za-z]+)', content, re.I)
+            entities\[name] = {
+                'eyes': eye\_match.group(1).lower() if eye\_match else None,
+                'hair': hair\_match.group(1).lower() if hair\_match else None
+            }
+
+    # Scan manuscripts for contradictions
+    print(f"\[\*] Tracking {len(entities)} lore entities across manuscripts...")
+    for mf in manuscript\_files:
+        with open(mf, 'r', errors='ignore') as f:
+            lines = f.readlines()
+            for idx, line in enumerate(lines, 1):
+                for name, attrs in entities.items():
+                    if name in line:
+                        if attrs\['eyes']:
+                            m = re.search(rf"{name}.\*?(\[a-z]+)\\s+eyes", line, re.I)
+                            if m and m.group(1).lower() != attrs\['eyes']:
+                                print(f"\[!] WARNING: Eye color mismatch in "
+                                      f"{os.path.basename(mf)}:L{idx}: "
+                                      f"'{m.group(1)}' vs Lore '{attrs\['eyes']}'")
+    print("\[\*] Audit complete.")
+
+if \_\_name\_\_ == '\_\_main\_\_':
+    audit\_manuscript(sys.argv\[1] if len(sys.argv) > 1 else
+                     os.path.expanduser('\~/Worlds/Default'))
+```
+
+## Appendix B: Reference Implementation — nftables Paranoid Ruleset
+
+```nft
+#!/usr/sbin/nft -f
+flush ruleset
+
+table inet filter {
+    chain input {
+        type filter hook input priority 0; policy drop;
+        ct state established,related accept
+        iif "lo" accept
+        icmp type { destination-unreachable, time-exceeded } accept
+    }
+    chain forward {
+        type filter hook forward priority 0; policy drop;
+    }
+    chain output {
+        type filter hook output priority 0; policy drop;
+        oif "lo" accept
+        meta skuid \_apt tcp dport { 80, 443 } accept
+        meta skuid root tcp dport { 80, 443 } accept
+        udp dport 123 accept
+    }
+}
+```
+
+## Appendix C: Reference Implementation — Kernel Hardening (`sysctl`)
+
+```ini
+# /etc/sysctl.d/99-ars-security.conf
+kernel.kptr\_restrict = 2
+kernel.dmesg\_restrict = 1
+kernel.unprivileged\_bpf\_disabled = 1
+net.core.bpf\_jit\_harden = 2
+kernel.yama.ptrace\_scope = 2
+kernel.unprivileged\_userns\_clone = 0
+net.ipv4.conf.all.send\_redirects = 0
+net.ipv4.conf.default.send\_redirects = 0
+net.ipv4.conf.all.accept\_redirects = 0
+net.ipv6.conf.all.accept\_redirects = 0
+fs.protected\_hardlinks = 1
+fs.protected\_symlinks = 1
+```
+

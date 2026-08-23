@@ -1,0 +1,27 @@
+# 00-base-system.list.chroot — Core Linux Base Packages
+linux-image-amd64
+systemd
+systemd-sysv
+network-manager
+pipewire
+pipewire-pulse
+wireplumber
+cryptsetup
+btrfs-progs
+zram-tools
+git
+rsync
+htop
+sudo
+curl
+wget
+ca-certificates
+os-prober
+python3
+python3-pip
+python3-pyqt6
+python3-tk
+zenity
+yad
+xdotool
+wmctrl

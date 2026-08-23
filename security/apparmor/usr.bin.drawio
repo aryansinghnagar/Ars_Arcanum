@@ -1,0 +1,21 @@
+# AppArmor profile for draw.io Desktop in Ars Arcanum
+
+abi <abi/3.0>,
+include <tunables/global>
+
+profile drawio /usr/bin/drawio /usr/local/bin/drawio {
+  include <abstractions/base>
+  include <abstractions/fonts>
+  include <abstractions/X>
+  include <abstractions/freedesktop.org>
+
+  deny network inet,
+  deny network inet6,
+
+  owner @{HOME}/Worlds/** rwkl,
+  owner @{HOME}/.config/drawio/** rwkl,
+  /tmp/** rwkl,
+
+  deny @{HOME}/.ssh/** rwklx,
+  deny @{HOME}/.gnupg/** rwklx,
+}

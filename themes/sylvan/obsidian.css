@@ -1,0 +1,12 @@
+/* Sylvan Obsidian Theme Snippet */
+.theme-dark, .theme-light {
+  --background-primary: #1b2d1b !important;
+  --background-secondary: #121f12 !important;
+  --background-secondary-alt: #2d4a2d !important;
+  --text-normal: #f0ead6 !important;
+  --text-accent: #d4a017 !important;
+  --interactive-accent: #d4a017 !important;
+  --text-muted: #8fa38f !important;
+  --font-family-editor: "EB Garamond", "Noto Serif", serif;
+  --h1-color: #d4a017 !important;
+}

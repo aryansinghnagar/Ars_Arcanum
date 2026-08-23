@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ars Arcanum — The Writer's Forge Help System</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="app-layout">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <div class="brand">
+        <h1>ARS ARCANUM</h1>
+        <p class="tagline">The Writer's Forge</p>
+      </div>
+      <nav class="nav-links">
+        <a href="#quickstart" class="nav-item active">🚀 Quick Start</a>
+        <a href="#workflows" class="nav-item">⚔ 6 Creative Arcs</a>
+        <a href="#tools" class="nav-item">🛠 Creative Tools</a>
+        <a href="#ars-suite" class="nav-item">⚡ The ars-* Suite</a>
+        <a href="#shortcuts" class="nav-item">⌨ Shortcuts Matrix</a>
+        <a href="#templates" class="nav-item">📜 Template Packs</a>
+        <a href="#security" class="nav-item">🔒 Security & Backups</a>
+        <a href="#troubleshooting" class="nav-item">❓ Troubleshooting</a>
+      </nav>
+      <div class="sidebar-footer">
+        <p>100% Offline Creative Appliance</p>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="content-container">
+      <header class="topbar">
+        <h2>Offline Help & Documentation System</h2>
+        <span class="badge">Press F1 anytime</span>
+      </header>
+
+      <div class="content-body">
+        <section id="quickstart" class="doc-section">
+          <h2>Quick Start Guide</h2>
+          <p>Welcome to <strong>Ars Arcanum</strong>, a dedicated, distraction-free Linux workstation built for speculative fiction authors and worldbuilders.</p>
+          <div class="callout callout-gold">
+            <strong>First 5 Minutes Workflow:</strong>
+            <ol>
+              <li>Open <strong>The Forge</strong> (Welcome App) or press <code>Super+Space</code> to launch tools.</li>
+              <li>Press <code>Super+W</code> to open your active <strong>Obsidian World Bible</strong>.</li>
+              <li>Press <code>Super+D</code> or <code>Super+N</code> to start drafting scenes in <strong>FocusWriter</strong> or <strong>novelWriter</strong>.</li>
+              <li>Press <code>Super+F</code> to enter <strong>Extreme Focus Mode</strong> (kiosk drafting with automated timer and Git auto-commit on exit).</li>
+            </ol>
+          </div>
+        </section>
+
+        <section id="workflows" class="doc-section">
+          <h2>The 6 Core Creative Arcs</h2>
+          <div class="grid-cards">
+            <div class="card">
+              <h3>1. Brainstorm & Lore</h3>
+              <p>Store characters, locations, factions, and investiture rules with YAML frontmatter in Obsidian & Fantasia Archive.</p>
+            </div>
+            <div class="card">
+              <h3>2. Outline & Structure</h3>
+              <p>Snowflake plotting, scene cards, and character psychology via novelWriter, Manuskript, and The Timeline Project.</p>
+            </div>
+            <div class="card">
+              <h3>3. Draft & Composition</h3>
+              <p>Distraction-free fullscreen writing in FocusWriter with parchment backgrounds and Blanket ambient soundscapes.</p>
+            </div>
+            <div class="card">
+              <h3>4. Cartography & Visuals</h3>
+              <p>Paint high-res continents in Krita with hardware OpenGL, and design vector heraldry crests in Inkscape.</p>
+            </div>
+            <div class="card">
+              <h3>5. Linguistics & Reference</h3>
+              <p>Construct conlang dictionaries in PolyGlot, generate custom runic fonts in FontForge, and lookup words with GoldenDict.</p>
+            </div>
+            <div class="card">
+              <h3>6. Typesetting & Press</h3>
+              <p>Compile 150,000 words in sub-250ms into 300 DPI print-ready PDFs using Typst and validated EPUB 3 via Pandoc.</p>
+            </div>
+          </div>
+        </section>
+
+        <section id="ars-suite" class="doc-section">
+          <h2>The ars-* Tool Suite Reference</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>CLI Command</th>
+                <th>Shortcut / GUI Access</th>
+                <th>Primary Function</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td><code>ars-focus [dnd|extreme|off]</code></td><td><code>Super+F</code> / Tray Padlock</td><td>Engage DND or kiosk drafting mode with Dunst pause & Timewarrior.</td></tr>
+              <tr><td><code>ars-snapshot</code></td><td><code>Super+S</code> / Welcome App</td><td>Automatic timestamped local Git commit across world repositories.</td></tr>
+              <tr><td><code>ars-compile [world]</code></td><td>Desktop Icon "Compile Book"</td><td>Compiles novelWriter drafts into Typst PDF proofs or Pandoc EPUBs.</td></tr>
+              <tr><td><code>ars-audit [world]</code></td><td>Welcome App → Audit Lore</td><td>Lints manuscripts for character attribute mismatches and broken links.</td></tr>
+              <tr><td><code>ars-travel &lt;miles&gt;</code></td><td>Welcome App → Tools</td><td>Calculates realistic transit time, camp stops, and marching provisions.</td></tr>
+              <tr><td><code>ars-loop [world]</code></td><td>Welcome App → Tools</td><td>Tracks character knowledge across time-loop iterations with draw.io export.</td></tr>
+              <tr><td><code>ars-theme [name]</code></td><td>Welcome App → System</td><td>Switches system styling across XFCE, GTK, Obsidian, and terminal.</td></tr>
+              <tr><td><code>ars-backup [-d]</code></td><td><code>Super+B</code> / Welcome App</td><td>Creates encrypted BorgBackup vaults or runs disaster restore drills.</td></tr>
+              <tr><td><code>ars-update</code></td><td>Welcome App → System</td><td>Creates Btrfs pre-snapshot, unlocks firewall relay, and updates OS.</td></tr>
+            </tbody>
+          </table>
+        </section>
+
+        <section id="shortcuts" class="doc-section">
+          <h2>Keyboard Shortcut Matrix</h2>
+          <div class="shortcut-list">
+            <div class="shortcut-row"><span class="key">Super + Space</span><span class="desc">Open Rofi Workflow Launcher</span></div>
+            <div class="shortcut-row"><span class="key">Super + W</span><span class="desc">Open Obsidian World Bible</span></div>
+            <div class="shortcut-row"><span class="key">Super + D</span><span class="desc">Open FocusWriter Drafting Kiosk</span></div>
+            <div class="shortcut-row"><span class="key">Super + N</span><span class="desc">Open novelWriter Project Manager</span></div>
+            <div class="shortcut-row"><span class="key">Super + G</span><span class="desc">Instant GoldenDict Dictionary Lookup</span></div>
+            <div class="shortcut-row"><span class="key">Ctrl + Alt + W</span><span class="desc">Instant Artha Thesaurus Lookup</span></div>
+            <div class="shortcut-row"><span class="key">Super + F</span><span class="desc">Engage Extreme Focus Mode</span></div>
+            <div class="shortcut-row"><span class="key">Super + Shift + F</span><span class="desc">Toggle Do Not Disturb (DND)</span></div>
+            <div class="shortcut-row"><span class="key">Super + Escape</span><span class="desc">Exit Focus Mode (Log Words & Git Commit)</span></div>
+            <div class="shortcut-row"><span class="key">Super + S</span><span class="desc">Manual Git Snapshot</span></div>
+            <div class="shortcut-row"><span class="key">F1</span><span class="desc">Open this Help System</span></div>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+</body>
+</html>

@@ -1,0 +1,20 @@
+#!/bin/sh
+# 01-hardening.hook.chroot — System Hardening & Service Masking
+
+set -e
+echo "[*] Executing Ars Arcanum Hardening Hook..."
+
+# Disable unneeded network and distraction background services
+systemctl mask avahi-daemon.service || true
+systemctl mask cups-browsed.service || true
+systemctl mask ModemManager.service || true
+systemctl mask bluetooth.service || true
+
+# Apply sysctl security profile
+sysctl -p /etc/sysctl.d/99-ars-security.conf || true
+
+# Enable and configure default nftables paranoid ruleset
+systemctl enable nftables.service || true
+cp /etc/nftables/paranoid.nft /etc/nftables.conf || true
+
+echo "[+] Hardening hook complete."

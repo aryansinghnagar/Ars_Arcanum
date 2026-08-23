@@ -1,0 +1,12 @@
+/* Astral Obsidian Theme Snippet */
+.theme-dark, .theme-light {
+  --background-primary: #0d1b2a !important;
+  --background-secondary: #08111a !important;
+  --background-secondary-alt: #1b263b !important;
+  --text-normal: #e0e0e0 !important;
+  --text-accent: #7ec8e3 !important;
+  --interactive-accent: #7ec8e3 !important;
+  --text-muted: #778da9 !important;
+  --font-family-editor: "Fira Code", "Lato", sans-serif;
+  --h1-color: #7ec8e3 !important;
+}

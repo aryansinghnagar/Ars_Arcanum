@@ -1,0 +1,14 @@
+# 01-desktop-xfce.list.chroot — XFCE 4.18 Desktop Environment & Minimal Shell
+xfce4
+xfce4-goodies
+xfce4-terminal
+thunar
+thunar-archive-plugin
+rofi
+dunst
+lightdm
+lightdm-gtk-greeter
+xserver-xorg
+xinit
+calamares
+calamares-settings-debian

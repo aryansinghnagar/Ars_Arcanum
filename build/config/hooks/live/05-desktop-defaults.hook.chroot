@@ -1,0 +1,20 @@
+#!/bin/sh
+# 05-desktop-defaults.hook.chroot — Desktop Shell, Shortcuts & Theme Activation
+
+set -e
+echo "[*] Configuring Ars Arcanum Desktop Defaults & Keyboard Bindings..."
+
+# Set executable permissions on ars-* tool suite
+chmod 755 /usr/local/bin/ars-* || true
+
+# Apply Grimoire default theme
+if [ -f /usr/local/bin/ars-theme ]; then
+  /usr/local/bin/ars-theme grimoire || true
+fi
+
+# Set LightDM autologin / default session to XFCE
+if [ -f /etc/lightdm/lightdm.conf ]; then
+  sed -i 's/^#user-session=.*/user-session=xfce/' /etc/lightdm/lightdm.conf || true
+fi
+
+echo "[+] Desktop defaults configured."

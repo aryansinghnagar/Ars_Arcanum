@@ -1,0 +1,32 @@
+# AppArmor profile for Obsidian in Ars Arcanum
+# Confines file access strictly to ~/Worlds/** and isolates network sockets
+
+abi <abi/3.0>,
+include <tunables/global>
+
+profile obsidian /app/extra/obsidian/obsidian flags=(attach_disconnected) {
+  include <abstractions/base>
+  include <abstractions/fonts>
+  include <abstractions/X>
+  include <abstractions/freedesktop.org>
+
+  # Deny all network socket operations
+  deny network inet,
+  deny network inet6,
+  deny network raw,
+
+  # Allow read/write access ONLY to the user's Worlds repository
+  owner @{HOME}/Worlds/** rwkl,
+  owner @{HOME}/.config/obsidian/** rwkl,
+  owner @{HOME}/.var/app/md.obsidian.Obsidian/** rwkl,
+  /tmp/** rwkl,
+  /dev/shm/** rwkl,
+
+  # Deny sensitive user credentials and keys
+  deny @{HOME}/.ssh/** rwklx,
+  deny @{HOME}/.gnupg/** rwklx,
+  deny @{HOME}/.bash* rwklx,
+  deny @{HOME}/.zsh* rwklx,
+  deny /etc/shadow r,
+  deny /etc/sudoers r,
+}

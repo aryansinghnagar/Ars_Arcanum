@@ -1,0 +1,9 @@
+# 02-desktop-labwc.list.chroot — Lightweight Wayland Alternative Session
+labwc
+waybar
+mako-notifier
+foot
+swaylock
+wl-clipboard
+grim
+slurp

@@ -1,0 +1,12 @@
+/* Obsidian Pure Black Theme Snippet */
+.theme-dark, .theme-light {
+  --background-primary: #111111 !important;
+  --background-secondary: #080808 !important;
+  --background-secondary-alt: #222222 !important;
+  --text-normal: #ffffff !important;
+  --text-accent: #aaaaaa !important;
+  --interactive-accent: #777777 !important;
+  --text-muted: #666666 !important;
+  --font-family-editor: "EB Garamond", serif;
+  --h1-color: #ffffff !important;
+}

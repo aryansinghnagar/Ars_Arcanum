@@ -1,0 +1,24 @@
+# AppArmor profile for Krita in Ars Arcanum
+
+abi <abi/3.0>,
+include <tunables/global>
+
+profile krita /usr/bin/krita {
+  include <abstractions/base>
+  include <abstractions/fonts>
+  include <abstractions/X>
+  include <abstractions/freedesktop.org>
+  include <abstractions/mesa>
+
+  deny network inet,
+  deny network inet6,
+
+  owner @{HOME}/Worlds/** rwkl,
+  owner @{HOME}/.config/kritarc rwkl,
+  owner @{HOME}/.local/share/krita/** rwkl,
+  /tmp/** rwkl,
+  /dev/dri/** rw,
+
+  deny @{HOME}/.ssh/** rwklx,
+  deny @{HOME}/.gnupg/** rwklx,
+}

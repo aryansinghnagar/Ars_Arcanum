@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 500" width="100%" height="100%">
+  <!-- House Vael Royal Heraldic Sigil -->
+  <defs>
+    <radialGradient id="ashGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#c9a96e" stop-opacity="0.8"/>
+      <stop offset="100%" stop-color="#1a1a2e" stop-opacity="1"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Escutcheon Shield Background -->
+  <path d="M 50 50 Q 200 30 350 50 L 350 280 Q 200 480 50 280 Z" fill="#141424" stroke="#c9a96e" stroke-width="6"/>
+
+  <!-- Field Divisions & Cinder Embers -->
+  <path d="M 50 50 L 350 280 L 50 280 Z" fill="#1a1a2e" opacity="0.6"/>
+  <path d="M 200 40 L 200 450" stroke="#c9a96e" stroke-width="2" stroke-dasharray="6,6"/>
+
+  <!-- Central Obsidian Salamander & Twin Blades Emblem -->
+  <circle cx="200" cy="220" r="75" fill="url(#ashGlow)" stroke="#c9a96e" stroke-width="4"/>
+
+  <!-- Crescent Blades -->
+  <path d="M 160 160 Q 200 220 160 280 Q 220 220 160 160 Z" fill="#f5e6c8"/>
+  <path d="M 240 160 Q 200 220 240 280 Q 180 220 240 160 Z" fill="#f5e6c8"/>
+
+  <!-- House Vael Crown -->
+  <polygon points="150,120 175,145 200,105 225,145 250,120 240,155 160,155" fill="#c9a96e" stroke="#141424" stroke-width="2"/>
+
+  <!-- House Motto Ribbon -->
+  <path d="M 70 450 Q 200 420 330 450 L 320 480 Q 200 450 80 480 Z" fill="#4a1942" stroke="#c9a96e" stroke-width="2"/>
+  <text x="200" y="468" font-family="Cinzel, serif" font-size="12" font-weight="bold" fill="#f5e6c8" text-anchor="middle">
+    FROM CINDERS, THE SOVEREIGN DAWN
+  </text>
+</svg>

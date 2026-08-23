@@ -1,0 +1,83 @@
+{
+  "world": "sample_world",
+  "narrative_structure": "Time Loop / Branching Reality",
+  "anchor_checkpoint": "The Festival of the Twin Moons \u2014 Eve",
+  "loops": [
+    {
+      "iteration": 1,
+      "title": "The Ignorant Beginning",
+      "cause_of_reset": "Assassination by the Shadow Cult",
+      "checkpoint_state": {
+        "protagonist_injuries": "None",
+        "inventory": [
+          "Silver Dagger",
+          "30 Gold Drachmas"
+        ],
+        "trauma_level": 1
+      },
+      "knowledge_matrix": {
+        "Protagonist": [
+          "Unaware of time loop until demise"
+        ],
+        "Allied Knight": [
+          "Loyal to Queen",
+          "Unaware of loop"
+        ],
+        "Shadow Assassin": [
+          "Knows target location",
+          "Unaware of loop"
+        ]
+      }
+    },
+    {
+      "iteration": 2,
+      "title": "The First Paranoia",
+      "cause_of_reset": "Poisoned wine at banquet",
+      "checkpoint_state": {
+        "protagonist_injuries": "Phantom chest pain",
+        "inventory": [
+          "Silver Dagger",
+          "Antidote Vial"
+        ],
+        "trauma_level": 4
+      },
+      "knowledge_matrix": {
+        "Protagonist": [
+          "Knows assassin attacks at midnight",
+          "Knows festival layout"
+        ],
+        "Allied Knight": [
+          "Suspects protagonist has lost sanity"
+        ],
+        "Shadow Assassin": [
+          "Changes attack vector to poison"
+        ]
+      }
+    },
+    {
+      "iteration": 3,
+      "title": "The Counter-Ambush",
+      "cause_of_reset": "Loop broken / Narrative convergence",
+      "checkpoint_state": {
+        "protagonist_injuries": "Scar on right shoulder",
+        "inventory": [
+          "Cult Seal",
+          "Royal Pardon Letter"
+        ],
+        "trauma_level": 6
+      },
+      "knowledge_matrix": {
+        "Protagonist": [
+          "Knows cult mastermind identity",
+          "Has memorized palace guard schedules"
+        ],
+        "Allied Knight": [
+          "Fully convinced after specific prophetic warnings"
+        ],
+        "Shadow Assassin": [
+          "Caught and interrogated"
+        ]
+      }
+    }
+  ]
+}
