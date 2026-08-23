@@ -22,26 +22,23 @@
 - [x] Task 3.10: Implement `src/cli/ars_mount.py`, `ars_update.py`, `ars_extensions.py`, `ars_help.py`
 - [x] Task 4.1: Implement `src/gui/ars_wizard/` (Theme preview, tool manifest, template picker, world scaffolding)
 - [x] Task 4.2: Implement `src/gui/ars_welcome/` ("The Forge" daily hub: worlds, quick actions, learn, shortcuts, system)
-- [x] Task 5.1: Package 5 complete visual themes (`grimoire`, `astral`, `sylvan`, `obsidian`, `ivory`)
+- [x] Task 5.1: Package 5 complete visual themes with 1080p SVG wallpapers & custom desktop icons
 - [x] Task 6.1: Author 5 methodology template packs (`sandersonian_magic`, `martinian_realism`, `jordanian_epic`, `nagatsukian_loop`, `falcom_ecology`)
-- [x] Task 6.2: Build complete "World of Elaris" reference project (`sample_world/`)
-- [x] Task 7.1: Build offline HTML/CSS help system (`docs/help_html/`)
-- [x] Task 7.2: Author complete Typst book manual (`docs/typst_manual/Ars-Arcanum-Manual.typ`)
-- [x] Task 8.1: Configure Debian `live-build` package manifests, chroot hooks, and build scripts (`build/`)
-- [x] Task 8.2: Configure Calamares installer settings and branding (`calamares/`)
-- [x] Task 9.1: Implement and verify automated pytest test suite (`tests/` — 14/14 passing)
+- [x] Task 6.2: Build complete "World of Elaris" reference project with vector cartography (`sample_world/`)
+- [x] Task 7.1: Build offline HTML/CSS help system (`docs/help_html/`) & Typst book manual (`docs/typst_manual/`)
+- [x] Task 7.2: Bundle Lightweight Reference Pack (Kiwix ZIM 937MB + 5 Worldbuilder Classics)
+- [x] Task 8.1: Configure Debian `live-build` manifests, chroot hooks, and container runner (`build/`)
+- [x] Task 8.2: Configure Calamares installer settings, branding, and custom Python firewall/security modules (`calamares/`)
+- [x] Task 9.1: Implement and verify automated pytest test suite (`tests/` — 20/20 passing)
+- [x] Task 10.1: Execute containerized ISO live-build and generate hybrid bootable ISO image (`build/output/live-image-amd64.hybrid.iso`)
 
 ### `next`
-- [ ] ISO Live-build generation on Debian 13 build host (`build/scripts/build_iso.sh`)
-- [ ] QEMU/KVM virtual machine verification (`build/scripts/test_qemu.sh`)
+- [ ] Flash bootable USB media using Rufus (DD mode) or Ventoy
+- [ ] Boot and execute dual-boot installation on target hardware (**The-Garden-Of-Words**: Intel i5-1335U, Iris Xe)
 
 ### `blocked`
 *(None)*
 
-### `improve`
-- [ ] Add pre-rendered visual assets to Calamares branding directory
-- [ ] Add additional conlang phonetic rule presets to PolyGlot template
-
 ### `recurring`
-- [x] Run pytest suite before commits
-- [x] Verify lore consistency audits
+- [x] Pre-commit pytest verification
+- [x] Lore continuity audits on world projects

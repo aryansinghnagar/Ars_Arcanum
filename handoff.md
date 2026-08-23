@@ -11,6 +11,8 @@
 8. Bundled the Worldbuilder Classics library and successfully downloaded the Kiwix Simple English Wikipedia archive (`wikipedia_simple.zim`, 937.3 MB).
 9. Authored the Bare-Metal Hardware Deployment Runbook (`docs/HARDWARE_DEPLOYMENT.md`).
 10. Achieved 20/20 automated pytest test passes (100% success rate).
+11. **Successfully compiled the bootable Debian 13 Hybrid ISO image (`build/output/live-image-amd64.hybrid.iso`, 4.0 GB) using Docker Desktop and Debian live-build!**
 
 ## Immediate Next Actions
-Execute `.\build\scripts\build_iso_docker.ps1` (with Docker Desktop running) or `sudo ./build/scripts/build_iso.sh` on a Debian 13 host to generate the final bootable hybrid ISO (`live-image-amd64.hybrid.iso`).
+1. Flash `build/output/live-image-amd64.hybrid.iso` to a USB flash drive via Rufus (DD image mode) or Ventoy.
+2. Boot into the live USB on the reference laptop (**The-Garden-Of-Words**: Intel i5-1335U, Iris Xe Graphics) and proceed with Calamares dual-boot installation following [`docs/HARDWARE_DEPLOYMENT.md`](file:///c:/Users/Aryan/OneDrive/Desktop/Coding%20Projects/6-Ars%20Arcanum/docs/HARDWARE_DEPLOYMENT.md).
