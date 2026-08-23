@@ -82,3 +82,15 @@ def test_freedesktop_entries():
         assert "Exec=" in content
         assert "Icon=" in content
         assert "Type=Application" in content
+
+
+def test_worldbuilder_classics_bundle():
+    classics_dir = REPO_ROOT / "build" / "config" / "includes.chroot" / "etc" / "skel" / "Documents" / "Worldbuilder-Classics"
+    assert classics_dir.exists()
+    texts = list(classics_dir.glob("*.md"))
+    assert len(texts) >= 5
+    for t in texts:
+        content = t.read_text(encoding="utf-8")
+        assert "---" in content
+        assert "reference_text" in content
+

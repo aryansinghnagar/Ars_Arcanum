@@ -1,0 +1,24 @@
+#!/bin/sh
+# 07-offline-reference.hook.chroot — Offline Encyclopedia & Worldbuilder Classics Integration
+
+set -e
+echo "[*] Configuring Offline Reference & Kiwix Library..."
+
+mkdir -p /var/lib/kiwix
+mkdir -p /etc/skel/Documents/Worldbuilder-Classics
+
+# Ensure permissions on offline archives
+chmod -R 755 /var/lib/kiwix || true
+chmod -R 755 /etc/skel/Documents/Worldbuilder-Classics || true
+
+# If kiwix-manage is installed, generate the library.xml
+if which kiwix-manage >/dev/null 2>&1; then
+    for zim in /var/lib/kiwix/*.zim; do
+        if [ -f "$zim" ]; then
+            echo "[+] Indexing $zim into Kiwix library..."
+            kiwix-manage /var/lib/kiwix/library.xml add "$zim" || true
+        fi
+    done
+fi
+
+echo "[+] Offline reference integration complete."
