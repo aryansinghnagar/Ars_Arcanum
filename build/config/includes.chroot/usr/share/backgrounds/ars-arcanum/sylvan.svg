@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080">
+  <defs>
+    <linearGradient id="sylvanBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#121f12"/>
+      <stop offset="50%" stop-color="#1b2d1b"/>
+      <stop offset="100%" stop-color="#0c170c"/>
+    </linearGradient>
+    <radialGradient id="canopyGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#d4a017" stop-opacity="0.14"/>
+      <stop offset="50%" stop-color="#3e2723" stop-opacity="0.10"/>
+      <stop offset="100%" stop-color="#1b2d1b" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="1920" height="1080" fill="url(#sylvanBg)"/>
+  <circle cx="960" cy="540" r="480" fill="url(#canopyGlow)"/>
+
+  <!-- Sylvan Runic Arbor Rings -->
+  <circle cx="960" cy="540" r="380" fill="none" stroke="#d4a017" stroke-width="1.2" stroke-opacity="0.2" stroke-dasharray="6,12"/>
+  <circle cx="960" cy="540" r="260" fill="none" stroke="#d4a017" stroke-width="1.5" stroke-opacity="0.25"/>
+  <circle cx="960" cy="540" r="140" fill="none" stroke="#d4a017" stroke-width="1" stroke-opacity="0.2"/>
+
+  <!-- Border Oak Framing -->
+  <rect x="45" y="45" width="1830" height="990" fill="none" stroke="#d4a017" stroke-width="1.2" stroke-opacity="0.3"/>
+  <rect x="55" y="55" width="1810" height="970" fill="none" stroke="#2d4a2d" stroke-width="0.8" stroke-opacity="0.2"/>
+
+  <text x="960" y="548" font-family="Cinzel, serif" font-size="28" font-weight="bold" fill="#d4a017" fill-opacity="0.28" text-anchor="middle" letter-spacing="8">
+    ARS ARCANUM
+  </text>
+  <text x="960" y="578" font-family="EB Garamond, serif" font-size="13" font-style="italic" fill="#f0ead6" fill-opacity="0.22" text-anchor="middle" letter-spacing="4">
+    The Sylvan Canopy
+  </text>
+</svg>

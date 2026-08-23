@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080">
+  <defs>
+    <linearGradient id="obsidianBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#080808"/>
+      <stop offset="50%" stop-color="#111111"/>
+      <stop offset="100%" stop-color="#050505"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1920" height="1080" fill="url(#obsidianBg)"/>
+
+  <!-- Ultra-Minimal Monastic Geometry -->
+  <circle cx="960" cy="540" r="300" fill="none" stroke="#333333" stroke-width="1" stroke-opacity="0.4"/>
+  <circle cx="960" cy="540" r="180" fill="none" stroke="#555555" stroke-width="1" stroke-opacity="0.3" stroke-dasharray="4,8"/>
+  <rect x="760" y="340" width="400" height="400" fill="none" stroke="#222222" stroke-width="1"/>
+
+  <rect x="60" y="60" width="1800" height="960" fill="none" stroke="#222222" stroke-width="1"/>
+
+  <text x="960" y="546" font-family="EB Garamond, serif" font-size="24" font-weight="bold" fill="#ffffff" fill-opacity="0.18" text-anchor="middle" letter-spacing="12">
+    ARS ARCANUM
+  </text>
+</svg>

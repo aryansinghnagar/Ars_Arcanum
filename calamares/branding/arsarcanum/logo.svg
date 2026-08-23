@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 120" width="500" height="120">
+  <defs>
+    <linearGradient id="logoGold" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#c9a96e"/>
+      <stop offset="50%" stop-color="#e8d5b5"/>
+      <stop offset="100%" stop-color="#c9a96e"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Anvil & Quill Icon -->
+  <g transform="translate(10, 10)">
+    <circle cx="50" cy="50" r="45" fill="#141424" stroke="#c9a96e" stroke-width="3"/>
+    <!-- Quill -->
+    <path d="M 30 70 Q 50 30 70 20 Q 55 45 40 70 Z" fill="url(#logoGold)"/>
+    <!-- Anvil Base -->
+    <path d="M 25 70 L 75 70 L 65 80 L 35 80 Z" fill="#c9a96e"/>
+  </g>
+
+  <!-- Typography -->
+  <text x="130" y="58" font-family="Cinzel, Georgia, serif" font-size="34" font-weight="bold" fill="url(#logoGold)" letter-spacing="4">
+    ARS ARCANUM
+  </text>
+  <text x="132" y="85" font-family="EB Garamond, serif" font-size="14" font-style="italic" fill="#f5e6c8" letter-spacing="2">
+    The Writer's Forge • The Worldbuilder's OS
+  </text>
+</svg>

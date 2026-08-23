@@ -1,0 +1,106 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" width="1600" height="1000">
+  <defs>
+    <!-- Map parchment background gradient -->
+    <linearGradient id="mapParchment" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#141424"/>
+      <stop offset="50%" stop-color="#1a1a2e"/>
+      <stop offset="100%" stop-color="#10101c"/>
+    </linearGradient>
+    <radialGradient id="volcanoGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#e63946" stop-opacity="0.8"/>
+      <stop offset="40%" stop-color="#c9a96e" stop-opacity="0.4"/>
+      <stop offset="100%" stop-color="#1a1a2e" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Parchment Canvas -->
+  <rect width="1600" height="1000" fill="url(#mapParchment)"/>
+
+  <!-- Topographic Elevation Contours -->
+  <g fill="none" stroke="#c9a96e" stroke-width="1" stroke-opacity="0.18">
+    <path d="M 200 150 Q 500 100 800 250 Q 1100 400 1400 200 Q 1550 400 1450 700 Q 1200 900 800 850 Q 400 800 200 650 Z"/>
+    <path d="M 350 250 Q 600 200 850 320 Q 1100 450 1300 350 Q 1400 500 1300 700 Q 1050 800 750 750 Q 450 700 350 500 Z"/>
+    <path d="M 500 350 Q 700 300 900 400 Q 1100 500 1150 450 Q 1200 580 1100 680 Q 900 720 700 680 Q 520 620 500 350 Z"/>
+  </g>
+
+  <!-- River of Cinders (Thermal Waterway) -->
+  <path d="M 800 500 Q 700 620 550 750 Q 400 850 250 950" fill="none" stroke="#7ec8e3" stroke-width="3.5" stroke-opacity="0.6"/>
+  <path d="M 800 500 Q 950 580 1150 700 Q 1350 800 1500 900" fill="none" stroke="#7ec8e3" stroke-width="2.5" stroke-opacity="0.4"/>
+
+  <!-- Mountain Ranges (Basalt Spires) -->
+  <g fill="#141424" stroke="#c9a96e" stroke-width="1.5">
+    <!-- North Spine -->
+    <polygon points="400,280 430,220 460,280"/>
+    <polygon points="450,290 490,200 530,290"/>
+    <polygon points="520,300 560,210 600,300"/>
+    <polygon points="580,280 620,180 660,280"/>
+    <polygon points="650,290 700,190 750,290"/>
+    <polygon points="1000,320 1050,200 1100,320"/>
+    <polygon points="1080,310 1130,220 1180,310"/>
+    <polygon points="1160,330 1200,240 1240,330"/>
+    <polygon points="1220,340 1270,230 1320,340"/>
+  </g>
+
+  <!-- Mount Ignis & Caldera (Center) -->
+  <circle cx="800" cy="480" r="140" fill="url(#volcanoGlow)"/>
+  <ellipse cx="800" cy="480" rx="90" ry="60" fill="#141424" stroke="#e63946" stroke-width="3"/>
+  <polygon points="730,470 800,360 870,470" fill="#1b1220" stroke="#c9a96e" stroke-width="2"/>
+
+  <!-- Landmark Callouts & Icons -->
+  <!-- Citadel of Ash -->
+  <rect x="780" y="440" width="40" height="40" fill="#c9a96e" stroke="#141424" stroke-width="2"/>
+  <polygon points="770,440 800,410 830,440" fill="#4a1942" stroke="#c9a96e" stroke-width="1.5"/>
+  <text x="800" y="520" font-family="Cinzel, serif" font-size="16" font-weight="bold" fill="#f5e6c8" text-anchor="middle">
+    THE CITADEL OF ASH
+  </text>
+  <text x="800" y="538" font-family="EB Garamond, serif" font-size="11" font-style="italic" fill="#c9a96e" text-anchor="middle">
+    Seat of House Vael • Mount Ignis
+  </text>
+
+  <!-- Sunstone Pass -->
+  <g transform="translate(1120, 360)">
+    <circle cx="0" cy="0" r="8" fill="#7ec8e3" stroke="#f5e6c8" stroke-width="2"/>
+    <text x="15" y="5" font-family="Cinzel, serif" font-size="13" font-weight="bold" fill="#f5e6c8">
+      Sunstone Pass
+    </text>
+    <text x="15" y="20" font-family="EB Garamond, serif" font-size="10" font-style="italic" fill="#a89f91">
+      Imperial March Route
+    </text>
+  </g>
+
+  <!-- Obsidian Rift -->
+  <g transform="translate(480, 580)">
+    <circle cx="0" cy="0" r="8" fill="#e63946" stroke="#f5e6c8" stroke-width="2"/>
+    <text x="-15" y="5" font-family="Cinzel, serif" font-size="13" font-weight="bold" fill="#f5e6c8" text-anchor="end">
+      The Obsidian Rift
+    </text>
+    <text x="-15" y="20" font-family="EB Garamond, serif" font-size="10" font-style="italic" fill="#a89f91" text-anchor="end">
+      Primordial Cinder Fissures
+    </text>
+  </g>
+
+  <!-- Compass Rose -->
+  <g transform="translate(1440, 160)">
+    <circle cx="0" cy="0" r="55" fill="#141424" stroke="#c9a96e" stroke-width="2"/>
+    <polygon points="0,-45 10,-10 0,0 -10,-10" fill="#e63946"/>
+    <polygon points="0,45 10,10 0,0 -10,10" fill="#c9a96e"/>
+    <polygon points="-45,0 -10,-10 0,0 -10,10" fill="#c9a96e"/>
+    <polygon points="45,0 10,-10 0,0 10,10" fill="#c9a96e"/>
+    <text x="0" y="-52" font-family="Cinzel, serif" font-size="14" font-weight="bold" fill="#c9a96e" text-anchor="middle">N</text>
+  </g>
+
+  <!-- Cartographic Border & Scale Bar -->
+  <rect x="30" y="30" width="1540" height="940" fill="none" stroke="#c9a96e" stroke-width="2.5"/>
+  <rect x="42" y="42" width="1516" height="916" fill="none" stroke="#c9a96e" stroke-width="1" stroke-dasharray="8,4"/>
+
+  <!-- Map Header Banner -->
+  <g transform="translate(120, 80)">
+    <rect x="0" y="0" width="320" height="70" fill="#141424" stroke="#c9a96e" stroke-width="2" rx="4"/>
+    <text x="160" y="30" font-family="Cinzel, serif" font-size="18" font-weight="bold" fill="#c9a96e" text-anchor="middle" letter-spacing="2">
+      THE ASHMARCH
+    </text>
+    <text x="160" y="52" font-family="EB Garamond, serif" font-size="11" font-style="italic" fill="#f5e6c8" text-anchor="middle">
+      World of Elaris • Regional Cartography
+    </text>
+  </g>
+</svg>

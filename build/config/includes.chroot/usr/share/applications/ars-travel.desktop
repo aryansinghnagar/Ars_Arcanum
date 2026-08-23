@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=Travel & Distance Calculator
+Comment=Calculate transit times and provisions across custom world geography
+Exec=/usr/local/bin/ars-travel 50
+Icon=ars-travel
+Terminal=true
+Type=Application
+Categories=Office;Utility;
+StartupNotify=true

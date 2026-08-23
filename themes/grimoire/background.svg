@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080">
+  <defs>
+    <!-- Grimoire Background Gradient & Textures -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#141424"/>
+      <stop offset="50%" stop-color="#1a1a2e"/>
+      <stop offset="100%" stop-color="#10101c"/>
+    </linearGradient>
+
+    <radialGradient id="arcaneGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#c9a96e" stop-opacity="0.18"/>
+      <stop offset="50%" stop-color="#4a1942" stop-opacity="0.12"/>
+      <stop offset="100%" stop-color="#1a1a2e" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Base Canvas -->
+  <rect width="1920" height="1080" fill="url(#bgGrad)"/>
+
+  <!-- Subtle Arcane Geometric Circles (Center) -->
+  <circle cx="960" cy="540" r="420" fill="url(#arcaneGlow)" stroke="#c9a96e" stroke-width="1" stroke-opacity="0.15" stroke-dasharray="4,8"/>
+  <circle cx="960" cy="540" r="360" fill="none" stroke="#c9a96e" stroke-width="1.5" stroke-opacity="0.22"/>
+  <circle cx="960" cy="540" r="280" fill="none" stroke="#c9a96e" stroke-width="1" stroke-opacity="0.18" stroke-dasharray="12,6"/>
+  <circle cx="960" cy="540" r="160" fill="none" stroke="#c9a96e" stroke-width="2" stroke-opacity="0.25"/>
+
+  <!-- Celestial Constellation Rays & Decagram -->
+  <polygon points="960,180 1140,440 1320,540 1140,640 960,900 780,640 600,540 780,440" fill="none" stroke="#c9a96e" stroke-width="1" stroke-opacity="0.12"/>
+  <line x1="960" y1="120" x2="960" y2="960" stroke="#c9a96e" stroke-width="1" stroke-opacity="0.15"/>
+  <line x1="540" y1="540" x2="1380" y2="540" stroke="#c9a96e" stroke-width="1" stroke-opacity="0.15"/>
+
+  <!-- Outer Border Filigree -->
+  <rect x="40" y="40" width="1840" height="1000" fill="none" stroke="#c9a96e" stroke-width="1.5" stroke-opacity="0.3"/>
+  <rect x="52" y="52" width="1816" height="976" fill="none" stroke="#c9a96e" stroke-width="0.8" stroke-opacity="0.15"/>
+
+  <!-- Corner Accents -->
+  <g stroke="#c9a96e" stroke-width="1.5" stroke-opacity="0.4" fill="none">
+    <path d="M 40 100 L 100 100 L 100 40"/>
+    <path d="M 1880 100 L 1820 100 L 1820 40"/>
+    <path d="M 40 980 L 100 980 L 100 1040"/>
+    <path d="M 1880 980 L 1820 980 L 1820 1040"/>
+  </g>
+
+  <!-- Typography Watermark (Subtle) -->
+  <text x="960" y="548" font-family="Cinzel, Georgia, serif" font-size="28" font-weight="bold" fill="#c9a96e" fill-opacity="0.25" text-anchor="middle" letter-spacing="8">
+    ARS ARCANUM
+  </text>
+  <text x="960" y="578" font-family="EB Garamond, serif" font-size="13" font-style="italic" fill="#f5e6c8" fill-opacity="0.2" text-anchor="middle" letter-spacing="4">
+    The Art of Secrets
+  </text>
+</svg>

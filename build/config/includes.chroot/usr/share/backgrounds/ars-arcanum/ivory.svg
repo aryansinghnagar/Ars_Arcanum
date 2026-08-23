@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080">
+  <defs>
+    <linearGradient id="ivoryBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fdfbf5"/>
+      <stop offset="50%" stop-color="#faf3e0"/>
+      <stop offset="100%" stop-color="#f2e6cb"/>
+    </linearGradient>
+    <radialGradient id="vellumGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#8b7355" stop-opacity="0.10"/>
+      <stop offset="100%" stop-color="#faf3e0" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="1920" height="1080" fill="url(#ivoryBg)"/>
+  <circle cx="960" cy="540" r="460" fill="url(#vellumGlow)"/>
+
+  <!-- Classical Border Filigree -->
+  <rect x="40" y="40" width="1840" height="1000" fill="none" stroke="#8b7355" stroke-width="1.8" stroke-opacity="0.4"/>
+  <rect x="52" y="52" width="1816" height="976" fill="none" stroke="#d2b48c" stroke-width="0.8" stroke-opacity="0.3"/>
+
+  <!-- Rosette Center -->
+  <circle cx="960" cy="540" r="320" fill="none" stroke="#8b7355" stroke-width="1.2" stroke-opacity="0.25"/>
+  <circle cx="960" cy="540" r="200" fill="none" stroke="#8b7355" stroke-width="1.5" stroke-opacity="0.3" stroke-dasharray="6,4"/>
+
+  <text x="960" y="546" font-family="Cinzel, serif" font-size="28" font-weight="bold" fill="#2c1810" fill-opacity="0.25" text-anchor="middle" letter-spacing="8">
+    ARS ARCANUM
+  </text>
+  <text x="960" y="576" font-family="EB Garamond, serif" font-size="13" font-style="italic" fill="#8b7355" fill-opacity="0.3" text-anchor="middle" letter-spacing="4">
+    The Classical Scriptorium
+  </text>
+</svg>

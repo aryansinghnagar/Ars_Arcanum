@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=Non-Linear Loop Tracker
+Comment=Track character knowledge and branching timeline states
+Exec=/usr/local/bin/ars-loop
+Icon=ars-wizard
+Terminal=true
+Type=Application
+Categories=Office;Utility;
+StartupNotify=true

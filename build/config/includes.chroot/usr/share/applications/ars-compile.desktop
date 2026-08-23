@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=Compile Book (Typst / Pandoc)
+Comment=Compile manuscript drafts into 300 DPI print PDFs, EPUB 3, or DOCX proofs
+Exec=/usr/local/bin/ars-compile
+Icon=ars-compile
+Terminal=false
+Type=Application
+Categories=Office;Publishing;
+StartupNotify=true

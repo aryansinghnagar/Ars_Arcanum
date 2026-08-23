@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=Ars Arcanum Help Manual
+Comment=Complete offline system guide, workflow tutorials, and keyboard shortcuts
+Exec=/usr/local/bin/ars-help
+Icon=help-browser
+Terminal=false
+Type=Application
+Categories=Documentation;Utility;
+StartupNotify=true

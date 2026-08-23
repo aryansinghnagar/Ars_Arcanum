@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=World Creation Wizard
+Comment=Scaffold new world projects and select author methodology template packs
+Exec=/usr/local/bin/ars-wizard
+Icon=ars-wizard
+Terminal=false
+Type=Application
+Categories=Office;Utility;
+StartupNotify=true

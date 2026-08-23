@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <defs>
+    <radialGradient id="iconGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#c9a96e"/>
+      <stop offset="100%" stop-color="#4a1942"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="128" height="128" rx="28" fill="#141424" stroke="#c9a96e" stroke-width="4"/>
+  <circle cx="64" cy="64" r="44" fill="none" stroke="#c9a96e" stroke-width="2" stroke-dasharray="4,4"/>
+
+  <!-- Quill & Blade -->
+  <path d="M 40 88 Q 64 36 90 24 Q 72 56 52 88 Z" fill="#c9a96e"/>
+  <circle cx="64" cy="64" r="8" fill="#f5e6c8"/>
+</svg>

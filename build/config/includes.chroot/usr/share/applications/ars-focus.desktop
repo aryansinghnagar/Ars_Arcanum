@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=Focus Mode Controller
+Comment=Manage Do Not Disturb and Extreme Focus kiosk drafting modes
+Exec=/usr/local/bin/ars-focus toggle
+Icon=ars-focus
+Terminal=false
+Type=Application
+Categories=Office;Utility;
+StartupNotify=true

@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=Audit Lore & Continuity
+Comment=Scan manuscripts for character attribute mismatches and broken wiki-links
+Exec=/usr/local/bin/ars-audit
+Icon=ars-audit
+Terminal=true
+Type=Application
+Categories=Office;Utility;
+StartupNotify=true

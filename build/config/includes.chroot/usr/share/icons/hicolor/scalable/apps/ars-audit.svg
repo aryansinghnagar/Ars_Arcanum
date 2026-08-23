@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <rect width="128" height="128" rx="28" fill="#1b263b" stroke="#7ec8e3" stroke-width="4"/>
+  <!-- Magnifying Glass & Lore Eye -->
+  <circle cx="56" cy="56" r="28" fill="#0d1b2a" stroke="#7ec8e3" stroke-width="4"/>
+  <circle cx="56" cy="56" r="10" fill="#c9a96e"/>
+  <line x1="76" y1="76" x2="100" y2="100" stroke="#7ec8e3" stroke-width="6" stroke-linecap="round"/>
+</svg>

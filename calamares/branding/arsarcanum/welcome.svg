@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400" width="600" height="400">
+  <defs>
+    <linearGradient id="welBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#141424"/>
+      <stop offset="100%" stop-color="#1a1a2e"/>
+    </linearGradient>
+    <radialGradient id="welGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#c9a96e" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="#1a1a2e" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="600" height="400" fill="url(#welBg)"/>
+  <circle cx="300" cy="180" r="160" fill="url(#welGlow)"/>
+
+  <!-- Forge Emblem -->
+  <circle cx="300" cy="170" r="80" fill="#111122" stroke="#c9a96e" stroke-width="3"/>
+  <path d="M 270 200 Q 300 130 330 110 Q 310 160 285 200 Z" fill="#c9a96e"/>
+  <polygon points="260,200 340,200 330,215 270,215" fill="#f5e6c8"/>
+
+  <text x="300" y="295" font-family="Cinzel, Georgia, serif" font-size="24" font-weight="bold" fill="#c9a96e" text-anchor="middle" letter-spacing="4">
+    WELCOME TO ARS ARCANUM
+  </text>
+  <text x="300" y="325" font-family="EB Garamond, serif" font-size="14" font-style="italic" fill="#f5e6c8" text-anchor="middle">
+    The Dedicated Workstation for Speculative Fiction Authors
+  </text>
+</svg>
