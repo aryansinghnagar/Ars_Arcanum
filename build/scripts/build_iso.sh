@@ -6,22 +6,28 @@ echo "========================================================"
 echo "    ARS ARCANUM LINUX DISTRIBUTION — ISO BUILD RUNNER   "
 echo "========================================================"
 
-BUILD_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-cd "$BUILD_ROOT"
+WORKSPACE="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+BUILD_DIR="$WORKSPACE/build"
+OUTPUT_DIR="$BUILD_DIR/output"
+mkdir -p "$OUTPUT_DIR"
 
-echo "[*] Checking build dependencies..."
-for cmd in lb debootstrap xorriso git; do
-  if ! command -v "$cmd" >/dev/null 2>&1; then
-    echo "[!] Missing required tool: $cmd"
-    echo "    Install on Debian: sudo apt install -y live-build debootstrap xorriso git"
-    exit 1
-  fi
-done
+echo "[*] Preparing chroot overlay from repository sources..."
+if command -v python3 >/dev/null 2>&1; then
+    python3 "$BUILD_DIR/scripts/prepare_overlay.py"
+fi
 
-echo "[*] Cleaning previous build trees..."
-lb clean --purge
+# Use native Linux tmpfs/filesystem for live-build rootfs
+CONTAINER_WORK_DIR="/tmp/ars-live-build"
+rm -rf "$CONTAINER_WORK_DIR"
+mkdir -p "$CONTAINER_WORK_DIR"
 
-echo "[*] Configuring live-build parameters..."
+echo "[*] Copying configuration tree to native Linux workspace ($CONTAINER_WORK_DIR)..."
+cp -a "$BUILD_DIR"/* "$CONTAINER_WORK_DIR/"
+cd "$CONTAINER_WORK_DIR"
+
+echo "[*] Initializing live-build configuration..."
+lb clean --purge || true
+
 lb config \
   --distribution trixie \
   --archive-areas "main contrib non-free non-free-firmware" \
@@ -33,7 +39,19 @@ lb config \
   --bootappend-live "boot=live components quiet splash security=apparmor apparmor=1 lsm=landlock,lockdown,yama,apparmor,bpf" \
   --apt-recommends false
 
-echo "[*] Building ISO image (this may take several minutes)..."
-sudo lb build
+echo "[*] Commencing live-build compilation (this downloads Debian 13 packages and builds rootfs)..."
+lb build
 
-echo "[+] BUILD COMPLETE: Ars Arcanum ISO generated successfully in $BUILD_ROOT"
+echo "[*] Copying compiled ISO image to output directory ($OUTPUT_DIR)..."
+cp -f *.iso "$OUTPUT_DIR/live-image-amd64.hybrid.iso" 2>/dev/null || cp -f live-image-*.iso "$OUTPUT_DIR/" 2>/dev/null || true
+
+cd "$OUTPUT_DIR"
+if ls *.iso >/dev/null 2>&1; then
+    sha256sum *.iso > "ars-arcanum-x86_64.iso.sha256"
+    echo "========================================================"
+    echo "[+] SUCCESS: Ars Arcanum ISO compiled successfully!"
+    echo "========================================================"
+    ls -lh "$OUTPUT_DIR"
+else
+    echo "[!] Warning: No .iso file detected in build output."
+fi

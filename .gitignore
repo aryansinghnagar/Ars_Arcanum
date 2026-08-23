@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+
+# Live-build generated metadata & intermediate artifacts
+build/.build/
+build/config/binary
+build/config/bootstrap
+build/config/chroot
+build/config/common
+build/config/source
+build/config/hooks/live/00*
+build/config/hooks/normal/
+build/output/
+*.tmp
+*.iso
+*.squashfs
+
+# Large ZIM archives
+*.zim
