@@ -1,4 +1,7 @@
 # AppArmor profile for Blanket in Ars Arcanum
+# Applies to native .deb installs. Flatpak installs
+# (com.rafaelmardojai.Blanket) are confined via
+# `flatpak override --nosocket=network` (see 03-flatpak-isolated-apps hook).
 
 abi <abi/3.0>,
 include <tunables/global>

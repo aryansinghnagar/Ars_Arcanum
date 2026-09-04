@@ -20,3 +20,17 @@ build/output/
 
 # Large ZIM archives
 *.zim
+
+# Generated live-build overlay (regenerate via build/scripts/prepare_overlay.py)
+build/config/includes.chroot/etc/apparmor.d/
+build/config/includes.chroot/etc/nftables/
+build/config/includes.chroot/etc/sysctl.d/
+build/config/includes.chroot/etc/udev/
+build/config/includes.chroot/etc/usbguard/
+build/config/includes.chroot/etc/calamares/
+build/config/includes.chroot/etc/skel/Worlds/
+build/config/includes.chroot/usr/local/
+build/config/includes.chroot/usr/share/ars-arcanum/
+build/config/includes.chroot/usr/share/doc/
+build/config/includes.chroot/usr/share/themes/
+build/config/includes.chroot/etc/skel/Documents/Ars-Arcanum-Manual.typ

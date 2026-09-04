@@ -6,11 +6,10 @@ Manages active world projects, one-click quick actions, tutorials, shortcuts, an
 """
 
 import sys
-import os
 import shutil
 import subprocess
 import tkinter as tk
-from tkinter import ttk, messagebox
+from tkinter import ttk
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
@@ -23,7 +22,7 @@ from common.config import (
     set_active_theme,
     AVAILABLE_THEMES,
 )
-from common.git_ops import create_snapshot, get_commit_history
+from common.git_ops import get_commit_history
 from common.logger import calculate_world_word_count
 from common.ui_helpers import show_notification, show_info_dialog
 
@@ -105,6 +104,9 @@ class ArsWelcomeApp(tk.Tk):
         self.render_tab_system()
 
     def render_tab_worlds(self):
+        # Clear previous cards (wizard return path calls this repeatedly)
+        for child in self.tab_worlds.winfo_children():
+            child.destroy()
         # Header & Create Button
         top_bar = tk.Frame(self.tab_worlds, bg="#1a1a2e")
         top_bar.pack(fill="x", pady=10)
@@ -218,18 +220,32 @@ class ArsWelcomeApp(tk.Tk):
         show_notification("Active World Changed", f"Current world is now '{w_name}'.", urgency="low")
 
     def open_world_wizard(self):
-        from gui.ars_wizard.main import ArsWizardApp
-        wizard = ArsWizardApp()
-        wizard.mainloop()
+        try:
+            from gui.ars_wizard.main import ArsWizardApp
+        except ImportError as e:
+            show_info_dialog("Wizard Unavailable", f"Could not load world wizard:\n{e}")
+            return
+        try:
+            wizard = ArsWizardApp()
+            wizard.mainloop()
+        except Exception as e:
+            show_info_dialog("Wizard Error", f"World wizard failed:\n{e}")
+        self.active_world = get_active_world_name()
         self.render_tab_worlds()
+
+    def _launch(self, argv: list) -> None:
+        try:
+            subprocess.Popen(argv, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        except (OSError, ValueError) as e:
+            show_info_dialog("Launch Failed", f"Could not start {' '.join(argv)}:\n{e}")
 
     def launch_obsidian(self, world_name: str):
         vault_path = str(DEFAULT_WORLDS_DIR / world_name / "00-World-Bible")
         print(f"[*] Launching Obsidian World Bible: {vault_path}")
         if shutil.which("obsidian"):
-            subprocess.Popen(["obsidian", vault_path])
+            self._launch(["obsidian", vault_path])
         elif shutil.which("flatpak"):
-            subprocess.Popen(["flatpak", "run", "md.obsidian.Obsidian", vault_path])
+            self._launch(["flatpak", "run", "md.obsidian.Obsidian", vault_path])
         else:
             show_info_dialog("Open World Bible", f"World Bible located at:\n{vault_path}")
 
@@ -237,9 +253,9 @@ class ArsWelcomeApp(tk.Tk):
         manuscript_path = str(DEFAULT_WORLDS_DIR / world_name / "01-Manuscripts")
         print(f"[*] Launching Drafting Suite: {manuscript_path}")
         if shutil.which("novelwriter"):
-            subprocess.Popen(["novelwriter", manuscript_path])
+            self._launch(["novelwriter", manuscript_path])
         elif shutil.which("focuswriter"):
-            subprocess.Popen(["focuswriter"])
+            self._launch(["focuswriter"])
         else:
             show_info_dialog("Manuscript Drafting", f"Manuscripts located at:\n{manuscript_path}")
 
@@ -285,41 +301,66 @@ class ArsWelcomeApp(tk.Tk):
             grid_frame.grid_rowconfigure(r, weight=1)
 
     def action_focus(self):
-        from cli.ars_focus import enter_extreme_mode
-        enter_extreme_mode()
+        try:
+            from cli.ars_focus import enter_extreme_mode
+            enter_extreme_mode()
+        except Exception as e:
+            show_info_dialog("Focus Failed", f"Could not enter focus mode:\n{e}")
 
     def action_compile(self):
-        from cli.ars_compile import compile_project
+        try:
+            from cli.ars_compile import compile_project
+        except ImportError as e:
+            show_info_dialog("Compile Unavailable", f"{e}")
+            return
         if self.active_world:
-            compile_project(DEFAULT_WORLDS_DIR / self.active_world, output_format="pdf")
-            show_info_dialog("Compilation Complete", f"Compiled Typst proof for '{self.active_world}'.")
+            try:
+                ok = compile_project(DEFAULT_WORLDS_DIR / self.active_world, output_format="pdf")
+                show_info_dialog("Compilation Complete" if ok else "Compilation Failed",
+                                 f"{'Compiled Typst proof for' if ok else 'Failed to compile'} '{self.active_world}'.")
+            except Exception as e:
+                show_info_dialog("Compilation Failed", f"{e}")
         else:
             show_info_dialog("No World", "Please select an active world first.")
 
     def action_audit(self):
-        from cli.ars_audit import run_audit
+        try:
+            from cli.ars_audit import run_audit
+        except ImportError as e:
+            show_info_dialog("Audit Unavailable", f"{e}")
+            return
         if self.active_world:
-            count = run_audit(DEFAULT_WORLDS_DIR / self.active_world)
+            try:
+                count = run_audit(DEFAULT_WORLDS_DIR / self.active_world)
+            except Exception as e:
+                show_info_dialog("Lore Audit Failed", f"{e}")
+                return
             if count == 0:
-                show_info_dialog("Lore Audit", "✨ Clean! Zero lore contradictions found.")
+                show_info_dialog("Lore Audit", "Clean! Zero lore contradictions found.")
             else:
                 show_info_dialog("Lore Audit", f"Found {count} continuity issues. Check terminal output for details.")
 
     def action_snapshot(self):
-        from cli.ars_snapshot import run_snapshots
-        run_snapshots(target_world=self.active_world)
+        try:
+            from cli.ars_snapshot import run_snapshots
+            run_snapshots(target_world=self.active_world)
+        except Exception as e:
+            show_info_dialog("Snapshot Failed", f"{e}")
 
     def action_maps(self):
         if shutil.which("krita"):
-            subprocess.Popen(["krita"])
+            self._launch(["krita"])
         elif shutil.which("inkscape"):
-            subprocess.Popen(["inkscape"])
+            self._launch(["inkscape"])
         else:
             show_info_dialog("Map Editor", "Opening 02-Maps directory...")
 
     def action_backup(self):
-        from cli.ars_backup import run_backup
-        run_backup()
+        try:
+            from cli.ars_backup import run_backup
+            run_backup()
+        except Exception as e:
+            show_info_dialog("Backup Failed", f"{e}")
 
     def render_tab_learn(self):
         scroll_canvas = tk.Canvas(self.tab_learn, bg="#1a1a2e", highlightthickness=0)
@@ -398,8 +439,11 @@ class ArsWelcomeApp(tk.Tk):
         tk.Button(ctrl_frame, text="Run Btrfs-Relayed OS Update", command=self.run_os_update, bg="#3a3a4e", fg="#f5e6c8", font=("Helvetica", 9), padx=10, pady=4, relief="flat").grid(row=1, column=1, columnspan=2, sticky="w", padx=10)
 
     def run_os_update(self):
-        from cli.ars_update import run_system_update
-        run_system_update()
+        try:
+            from cli.ars_update import run_system_update
+            run_system_update()
+        except Exception as e:
+            show_info_dialog("Update Failed", f"{e}")
 
 
 def main():

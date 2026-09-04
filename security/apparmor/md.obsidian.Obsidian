@@ -1,10 +1,12 @@
 # AppArmor profile for Obsidian in Ars Arcanum
 # Confines file access strictly to ~/Worlds/** and isolates network sockets
+# Flatpak path varies by runtime (/app/extra/obsidian/obsidian, /app/bin/obsidian);
+# primary Flatpak confinement is `flatpak override --nosocket=network`.
 
 abi <abi/3.0>,
 include <tunables/global>
 
-profile obsidian /app/extra/obsidian/obsidian flags=(attach_disconnected) {
+profile obsidian /app/extra/obsidian/obsidian /app/bin/obsidian flags=(attach_disconnected) {
   include <abstractions/base>
   include <abstractions/fonts>
   include <abstractions/X>

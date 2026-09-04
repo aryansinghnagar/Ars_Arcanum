@@ -1,0 +1,8 @@
+---
+type: job
+name: ars_firewall
+interface: python
+script: main.py
+workingPath: /usr/lib/calamares/modules/ars_firewall
+# Set via globalstorage by welcome page; defaults to paranoid in main.py
+#   ars_firewall_mode: paranoid | standard | airplane

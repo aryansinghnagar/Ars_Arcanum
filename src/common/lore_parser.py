@@ -36,10 +36,14 @@ def parse_frontmatter(content: str) -> Tuple[Dict[str, Any], str]:
                     frontmatter[key] = True
                 elif val.lower() in ("false", "no"):
                     frontmatter[key] = False
-                elif val.isdigit():
-                    frontmatter[key] = int(val)
                 else:
-                    frontmatter[key] = val.strip("'\"")
+                    try:
+                        frontmatter[key] = int(val)
+                    except ValueError:
+                        try:
+                            frontmatter[key] = float(val)
+                        except ValueError:
+                            frontmatter[key] = val.strip("'\"")
 
     return frontmatter, body.strip()
 
@@ -49,17 +53,19 @@ def format_frontmatter(metadata: Dict[str, Any], body: str) -> str:
     lines = ["---"]
     for k, v in metadata.items():
         if isinstance(v, list):
-            items_str = ", ".join([f'"{x}"' if " " in str(x) else str(x) for x in v])
+            items = [str(x).replace('"', '\\"') for x in v]
+            items_str = ", ".join([f'"{x}"' if (" " in x or ":" in x or '"' in x) else x for x in items])
             lines.append(f"{k}: [{items_str}]")
         elif isinstance(v, bool):
             lines.append(f"{k}: {'true' if v else 'false'}")
         elif isinstance(v, (int, float)):
             lines.append(f"{k}: {v}")
         else:
-            if "\n" in str(v) or ":" in str(v):
-                lines.append(f'{k}: "{v}"')
+            s = str(v).replace('"', '\\"')
+            if "\n" in s or ":" in s or '"' in str(v) or s != str(v).strip():
+                lines.append(f'{k}: "{s}"')
             else:
-                lines.append(f"{k}: {v}")
+                lines.append(f"{k}: {s}")
     lines.append("---")
     lines.append("")
     lines.append(body.lstrip("\r\n"))
@@ -81,6 +87,17 @@ class EntityRecord:
         return f"<EntityRecord {self.name} ({self.entity_type}): {self.attributes}>"
 
 
+def _norm_name(s: str) -> str:
+    """Canonical form for name matching: underscores/spaces unified, case-insensitive."""
+    return str(s).replace("_", " ").casefold().strip()
+
+
+def _name_variants(name: str) -> List[str]:
+    """All spelling variants of an entity name (space/underscore, original case kept)."""
+    variants = {name, name.replace("_", " "), name.replace(" ", "_")}
+    return [v for v in variants if v]
+
+
 def extract_world_entities(world_dir: Path) -> Dict[str, EntityRecord]:
     """
     Extract all defined entities and attributes from 00-World-Bible.
@@ -94,7 +111,7 @@ def extract_world_entities(world_dir: Path) -> Dict[str, EntityRecord]:
     for md_file in bible_dir.rglob("*.md"):
         try:
             content = md_file.read_text(encoding="utf-8", errors="ignore")
-        except Exception:
+        except OSError:
             continue
 
         name = md_file.stem
@@ -103,37 +120,44 @@ def extract_world_entities(world_dir: Path) -> Dict[str, EntityRecord]:
 
         record = EntityRecord(name=name, filepath=md_file, entity_type=str(entity_type))
         record.tags = frontmatter.get("tags", []) if isinstance(frontmatter.get("tags"), list) else []
+        # Bidirectional aliases: filename with spaces AND underscores, plus title variants
+        for variant in _name_variants(name):
+            if variant not in record.aliases:
+                record.aliases.append(variant)
 
         if "title" in frontmatter and frontmatter["title"]:
             t_title = str(frontmatter["title"]).strip()
-            if t_title not in record.aliases:
-                record.aliases.append(t_title)
+            for variant in _name_variants(t_title):
+                if variant not in record.aliases:
+                    record.aliases.append(variant)
 
-        # Populate attributes from frontmatter
+        # Populate attributes from frontmatter, preserving original case.
+        # Comparisons elsewhere use .casefold() so "Violet" matches "violet".
         for k, v in frontmatter.items():
             if k not in ("title", "type", "tags", "world", "project"):
-                record.attributes[k.lower()] = str(v).lower()
+                record.attributes[k.lower()] = str(v)
 
         # Regex scan body for physical & lore attributes if not in frontmatter
+        # (original case preserved; matching is case-insensitive downstream)
         if "eyes" not in record.attributes:
-            eye_match = re.search(r"\beyes?:\s*([a-zA-Z]+)", content, re.IGNORECASE)
+            eye_match = re.search(r"\beyes?:\s*([a-zA-Z][a-zA-Z\-]*)", content, re.IGNORECASE)
             if eye_match:
-                record.attributes["eyes"] = eye_match.group(1).lower()
+                record.attributes["eyes"] = eye_match.group(1)
 
         if "hair" not in record.attributes:
-            hair_match = re.search(r"\bhair:\s*([a-zA-Z]+)", content, re.IGNORECASE)
+            hair_match = re.search(r"\bhair:\s*([a-zA-Z][a-zA-Z\-]*)", content, re.IGNORECASE)
             if hair_match:
-                record.attributes["hair"] = hair_match.group(1).lower()
+                record.attributes["hair"] = hair_match.group(1)
 
         if "title" not in record.attributes:
-            title_match = re.search(r"\btitle:\s*([a-zA-Z\s]+)", content, re.IGNORECASE)
+            title_match = re.search(r"\btitle:\s*([a-zA-Z][a-zA-Z\s\-']{1,80})", content, re.IGNORECASE)
             if title_match:
-                record.attributes["title"] = title_match.group(1).strip().lower()
+                record.attributes["title"] = title_match.group(1).strip()
 
         if "faction" not in record.attributes:
-            faction_match = re.search(r"\bfaction:\s*([a-zA-Z\s]+)", content, re.IGNORECASE)
+            faction_match = re.search(r"\bfaction:\s*([a-zA-Z][a-zA-Z\s\-']{1,80})", content, re.IGNORECASE)
             if faction_match:
-                record.attributes["faction"] = faction_match.group(1).strip().lower()
+                record.attributes["faction"] = faction_match.group(1).strip()
 
         entities[name] = record
         for alias in record.aliases:
@@ -160,60 +184,64 @@ def audit_manuscript_consistency(world_dir: Path) -> List[Dict[str, Any]]:
     if not manuscripts_dir.exists():
         return findings
 
-    all_entity_names = set(entities.keys())
+    # Dedupe aliased records once (aliases map to the same EntityRecord)
+    unique_records: List[EntityRecord] = list({id(r): r for r in entities.values()}.values())
+    norm_names = {_norm_name(n) for n in entities}
 
     for md_file in sorted(manuscripts_dir.rglob("*.md")):
         try:
             content = md_file.read_text(encoding="utf-8", errors="ignore")
-        except Exception:
+        except OSError:
             continue
+        rel = str(md_file.relative_to(world_dir))
 
-        lines = content.splitlines()
-        for idx, line in enumerate(lines, 1):
-            # Check 1: Broken wiki-links [[Entity Name]]
-            wiki_links = re.findall(r"\[\[(.*?)\]\]", line)
-            for link in wiki_links:
+        # Check 1 (per line): broken wiki-links, matched bidirectionally + case-insensitively
+        for idx, line in enumerate(content.splitlines(), 1):
+            for link in re.findall(r"\[\[(.*?)\]\]", line):
                 target = link.split("|")[0].strip()
-                if target not in all_entity_names and target.replace(" ", "_") not in all_entity_names:
+                if _norm_name(target) not in norm_names:
                     findings.append({
-                        "file": str(md_file.relative_to(world_dir)),
+                        "file": rel,
                         "line": idx,
                         "severity": "WARNING",
                         "category": "Broken Lore Link",
                         "message": f"Wiki-link [[{target}]] has no corresponding entry in World Bible.",
                     })
 
-            # Check 2: Attribute contradictions across known entities
-            for name, record in entities.items():
-                if name in line:
-                    expected_eyes = record.attributes.get("eyes")
-                    if expected_eyes:
-                        eye_regex = rf"\b{re.escape(name)}.*?([a-zA-Z]+)\s+eyes\b"
-                        m = re.search(eye_regex, line, re.IGNORECASE)
-                        if m:
-                            found_color = m.group(1).lower()
-                            if found_color != expected_eyes and found_color not in ("his", "her", "their", "the", "with", "both"):
-                                findings.append({
-                                    "file": str(md_file.relative_to(world_dir)),
-                                    "line": idx,
-                                    "severity": "ERROR",
-                                    "category": "Attribute Contradiction",
-                                    "message": f"Eye color mismatch for '{name}': '{found_color}' vs Lore '{expected_eyes}' in {record.filepath.name}",
-                                })
-
-                    expected_hair = record.attributes.get("hair")
-                    if expected_hair:
-                        hair_regex = rf"\b{re.escape(name)}.*?([a-zA-Z]+)\s+hair\b"
-                        m = re.search(hair_regex, line, re.IGNORECASE)
-                        if m:
-                            found_hair = m.group(1).lower()
-                            if found_hair != expected_hair and found_hair not in ("his", "her", "their", "the", "with", "long", "short"):
-                                findings.append({
-                                    "file": str(md_file.relative_to(world_dir)),
-                                    "line": idx,
-                                    "severity": "ERROR",
-                                    "category": "Attribute Contradiction",
-                                    "message": f"Hair color mismatch for '{name}': '{found_hair}' vs Lore '{expected_hair}' in {record.filepath.name}",
-                                })
+        # Check 2 (whole file, DOTALL): attribute contradictions may span line breaks,
+        # e.g. "Lord Raymond stared\nwith bright blue eyes". Line numbers derived
+        # from the match offset. Gated on name presence per record for performance.
+        for record in unique_records:
+            present = any(
+                cand and re.search(rf"\b{re.escape(cand)}\b", content, re.IGNORECASE)
+                for cand in [record.name] + record.aliases
+            )
+            if not present:
+                continue
+            for attr, lore_value, words, label in (
+                ("eyes", record.attributes.get("eyes"), ("his", "her", "their", "the", "with", "both"), "Eye color"),
+                ("hair", record.attributes.get("hair"), ("his", "her", "their", "the", "with", "long", "short"), "Hair color"),
+            ):
+                if not lore_value:
+                    continue
+                for cand in [record.name] + record.aliases:
+                    if not cand:
+                        continue
+                    m = re.search(
+                        rf"\b{re.escape(cand)}\b.*?([a-zA-Z][a-zA-Z\-]*)\s+{attr}\b",
+                        content, re.IGNORECASE | re.DOTALL,
+                    )
+                    if m:
+                        found = m.group(1)
+                        if found.casefold() != lore_value.casefold() and found.casefold() not in words:
+                            line_no = content.count("\n", 0, m.start()) + 1
+                            findings.append({
+                                "file": rel,
+                                "line": line_no,
+                                "severity": "ERROR",
+                                "category": "Attribute Contradiction",
+                                "message": f"{label} mismatch for '{cand}': '{found}' vs Lore '{lore_value}' in {record.filepath.name}",
+                            })
+                        break
 
     return findings

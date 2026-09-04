@@ -6,6 +6,8 @@ apparmor-profiles
 apparmor-profiles-extra
 usbguard
 borgbackup
-sbsigntool
+sbctl
 mokutil
+sbsigntool
 libpam-systemd
+kiwix-tools

@@ -8,6 +8,7 @@ import sys
 import shutil
 import argparse
 import subprocess
+from datetime import datetime
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
@@ -15,18 +16,53 @@ from common.ui_helpers import show_notification, show_info_dialog, show_error_di
 
 
 def create_btrfs_snapshot() -> bool:
-    """Create instant pre-update Btrfs snapshot for instant rollback."""
+    """Create instant pre-update Btrfs snapshot for instant rollback.
+
+    Returns True when a snapshot was created or when btrfs is absent
+    (nothing to snapshot — not a failure). Returns False only when a
+    snapshot was attempted but failed.
+    """
     print("[*] Creating pre-update Btrfs system snapshot...")
-    if shutil.which("btrfs"):
-        try:
-            timestamp = subprocess.check_output(["date", "+%Y%m%d_%H%M%S"], text=True).strip()
-            snap_target = f"/.snapshots/pre-update-{timestamp}"
-            subprocess.run(["sudo", "btrfs", "subvolume", "snapshot", "/", snap_target], check=False)
+    if not shutil.which("btrfs"):
+        print("[-] Btrfs tools not installed; skipping snapshot (non-btrfs root).")
+        return True
+    try:
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        snap_target = f"/.snapshots/pre-update-{timestamp}"
+        proc = subprocess.run(
+            ["sudo", "btrfs", "subvolume", "snapshot", "/", snap_target],
+            capture_output=True, text=True, check=False,
+        )
+        if proc.returncode == 0:
             print(f"[+] Btrfs snapshot created: {snap_target}")
             return True
-        except Exception:
-            pass
-    print("[-] Btrfs snapshotting skipped (non-btrfs root).")
+        print(f"[!] Btrfs snapshot failed: {proc.stderr.strip()[:300]}")
+        return False
+    except OSError as e:
+        print(f"[!] Btrfs snapshot failed: {e}")
+        return False
+
+
+def _set_firewall(mode: str) -> bool:
+    """Switch nftables policy using ONLY the mode-specific ruleset.
+
+    Never falls back to the generic /etc/nftables.conf, whose content is
+    distro-controlled and may not match the requested mode. Returns True
+    when the requested ruleset was applied.
+    """
+    if mode not in ("standard", "paranoid"):
+        return False
+    src = Path(f"/etc/nftables/{mode}.nft")
+    if not src.exists():
+        print(f"[!] Firewall ruleset missing: {src}; leaving current policy in place.")
+        return False
+    if not shutil.which("nft"):
+        print("[!] nft binary not found; cannot switch firewall policy.")
+        return False
+    proc = subprocess.run(["sudo", "nft", "-f", str(src)], capture_output=True, text=True, check=False)
+    if proc.returncode != 0:
+        print(f"[!] Failed to apply {src}: {proc.stderr.strip()[:300]}")
+        return False
     return True
 
 
@@ -34,6 +70,9 @@ def run_system_update() -> bool:
     create_btrfs_snapshot()
 
     print("[*] Opening temporary firewall relay for Debian and Flathub package mirrors...")
+    print("[*] (Paranoid mode blocks Flatpak user updates; switching to Standard for update window.)")
+    if not _set_firewall("standard"):
+        print("[!] Continuing update with current firewall policy.")
     # In Paranoid mode, apt UID _apt is permitted; standard updates can run
     show_notification("OS Update Started", "Refreshing package repositories...", urgency="normal", icon="system-software-update")
 
@@ -58,9 +97,10 @@ def run_system_update() -> bool:
         return False
     finally:
         print("[*] Verifying nftables firewall lockdown status...")
-        # Ensure firewall remains locked down
-        if shutil.which("nft"):
-            subprocess.run(["sudo", "nft", "-f", "/etc/nftables/paranoid.nft"], check=False)
+        # Relock to Paranoid after updates; report honestly if relock fails.
+        if not _set_firewall("paranoid"):
+            print("[!] WARNING: could not relock Paranoid firewall; check /etc/nftables/paranoid.nft.")
+            show_error_dialog("Firewall Relock Failed", "Paranoid nftables policy could not be reapplied.")
 
 
 def main():

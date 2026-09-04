@@ -85,12 +85,12 @@ def ask_text_input(title: str, prompt: str, default: str = "") -> Optional[str]:
             return None
         except Exception:
             pass
-    # Fallback to non-blocking or default
-    return default
+    # Fallback: no non-interactive default — caller must handle None.
+    return None
 
 
 def ask_confirmation(title: str, question: str) -> bool:
-    """Prompt user for confirmation (Yes/No)."""
+    """Prompt user for confirmation (Yes/No). Defaults to DENY when headless."""
     if shutil.which("zenity"):
         try:
             proc = subprocess.run(
@@ -100,4 +100,6 @@ def ask_confirmation(title: str, question: str) -> bool:
             return proc.returncode == 0
         except Exception:
             pass
-    return True
+    # Secure default: deny. Never auto-mount / auto-confirm without explicit UI.
+    print(f"[CONFIRM] {title}: {question} (auto-deny: no dialog backend)")
+    return False

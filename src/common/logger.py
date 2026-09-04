@@ -31,9 +31,18 @@ def log_writing_session(
         entry.append("| Timestamp | Session Type | Duration (min) | Words Logged | Notes |")
         entry.append("|---|---|---|---|---|")
 
-    safe_notes = (notes or "Normal deep work session").replace("|", "-")
+    safe_notes = (notes or "Normal deep work session").replace("|", "-").replace("\n", " ").replace("\r", " ")[:500]
+    try:
+        duration_val = float(duration_minutes)
+    except (TypeError, ValueError):
+        duration_val = 0.0
+    try:
+        words_val = int(words_written)
+    except (TypeError, ValueError):
+        words_val = 0
+    safe_type = str(session_type).replace("|", "-").replace("\n", " ")[:80]
     entry.append(
-        f"| {now_str} | {session_type} | {duration_minutes:.1f} | {words_written:+d} | {safe_notes} |"
+        f"| {now_str} | {safe_type} | {duration_val:.1f} | {words_val:+d} | {safe_notes} |"
     )
 
     with open(log_file, "a", encoding="utf-8") as f:
@@ -53,6 +62,6 @@ def calculate_world_word_count(world_dir: Path) -> int:
             _, body = parse_frontmatter(text)
             words = body.split()
             total_words += len(words)
-        except Exception:
+        except OSError:
             continue
     return total_words

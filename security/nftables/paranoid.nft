@@ -2,6 +2,9 @@
 # Ars Arcanum Paranoid Mode Firewall Configuration
 # Drops all unsolicited inbound and outbound network traffic.
 # Outbound exceptions: UID _apt & root for ports 80/443 (Debian/Flathub), NTP (123), Loopback.
+# NOTE: Paranoid mode intentionally breaks Flatpak user-space updates
+# (flatpak runs as unprivileged user, not _apt/root). For updates, switch to
+# Standard mode (`ars-update` handles this) or run: sudo nft -f /etc/nftables/standard.nft
 
 flush ruleset
 

@@ -1,0 +1,8 @@
+---
+type: job
+name: ars_hardware_security
+interface: python
+script: main.py
+workingPath: /usr/lib/calamares/modules/ars_hardware_security
+# Set via globalstorage by welcome page; defaults to false (opt-in) in main.py
+#   ars_enable_hardware_security: false

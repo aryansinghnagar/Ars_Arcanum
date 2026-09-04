@@ -113,37 +113,69 @@ def generate_obsidian_css(palette: dict) -> str:
 """
 
 
-def apply_theme(theme_name: str) -> None:
+def apply_theme(theme_name: str) -> bool:
     theme = theme_name.lower()
     if theme not in THEME_PALETTES:
         print(f"[!] Invalid theme '{theme_name}'. Available: {', '.join(AVAILABLE_THEMES)}")
-        return
+        return False
 
     palette = THEME_PALETTES[theme]
-    set_active_theme(theme)
 
-    # 1. Update GTK CSS
+    # 1. Update GTK CSS (with backup for rollback)
     gtk_config_dir = Path.home() / ".config" / "gtk-3.0"
-    gtk_config_dir.mkdir(parents=True, exist_ok=True)
-    (gtk_config_dir / "gtk.css").write_text(generate_gtk_css(palette), encoding="utf-8")
+    try:
+        gtk_config_dir.mkdir(parents=True, exist_ok=True)
+    except OSError as e:
+        print(f"[!] Could not create {gtk_config_dir}: {e}")
+        return False
+    gtk_css = gtk_config_dir / "gtk.css"
+    if gtk_css.exists():
+        try:
+            backup = gtk_css.with_suffix(".css.ars-backup")
+            if not backup.exists():
+                shutil.copy2(gtk_css, backup)
+        except OSError as e:
+            print(f"[!] Could not back up {gtk_css}: {e}")
+    try:
+        gtk_css.write_text(generate_gtk_css(palette), encoding="utf-8")
+    except OSError as e:
+        print(f"[!] Could not write {gtk_css}: {e}")
+        return False
 
-    # 2. Update Obsidian Vaults snippets
+    # 2. Update Obsidian Vaults snippets (backup existing per-vault file)
     obsidian_css = generate_obsidian_css(palette)
     for world in list_worlds():
         vault_snippets = DEFAULT_WORLDS_DIR / world / "00-World-Bible" / ".obsidian" / "snippets"
-        vault_snippets.mkdir(parents=True, exist_ok=True)
-        (vault_snippets / "ars-theme.css").write_text(obsidian_css, encoding="utf-8")
+        try:
+            vault_snippets.mkdir(parents=True, exist_ok=True)
+            snippet = vault_snippets / "ars-theme.css"
+            if snippet.exists():
+                bak = snippet.with_suffix(".css.ars-backup")
+                if not bak.exists():
+                    shutil.copy2(snippet, bak)
+            snippet.write_text(obsidian_css, encoding="utf-8")
+        except OSError as e:
+            print(f"[!] Could not update theme snippet for world '{world}': {e}")
+            continue
 
     # 3. Update XFCE theme settings if xfconf is present
     if shutil.which("xfconf-query"):
         try:
             subprocess.run(["xfconf-query", "-c", "xsettings", "-p", "/Net/ThemeName", "-s", f"ars-{theme}"], check=False)
             subprocess.run(["xfconf-query", "-c", "xfwm4", "-p", "/general/theme", "-s", f"ars-{theme}"], check=False)
-        except Exception:
+        except OSError:
             pass
+
+    # Persist selection only after all writes succeeded (a failure above returns False first)
+    try:
+        set_active_theme(theme)
+    except ValueError as e:
+        print(f"[!] Could not persist theme selection: {e}")
+        return False
 
     print(f"[+] Applied Theme: {palette['name']}")
     show_notification("Theme Updated", f"Applied {palette['name']}", urgency="low", icon="preferences-desktop-theme")
+    return True
 
 
 def main():
@@ -162,7 +194,8 @@ def main():
         return
 
     if args.theme:
-        apply_theme(args.theme)
+        ok = apply_theme(args.theme)
+        sys.exit(0 if ok else 1)
     else:
         print(f"Active Theme: {get_active_theme().upper()}")
 

@@ -5,14 +5,13 @@ A visual multi-step setup wizard for theme selection, tool manifest, template pa
 """
 
 import sys
-import os
 import tkinter as tk
-from tkinter import ttk, messagebox
+from tkinter import messagebox
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
-from common.config import AVAILABLE_THEMES, set_active_theme, get_active_theme
-from common.ui_helpers import show_notification
+from common.config import set_active_theme
+from common.ui_helpers import show_notification, show_info_dialog
 from gui.ars_wizard.scaffold import scaffold_world_project
 
 THEME_DATA = {
@@ -172,7 +171,11 @@ class ArsWizardApp(tk.Tk):
             preview.pack(side="right")
 
     def on_theme_selected(self):
-        set_active_theme(self.selected_theme.get())
+        try:
+            set_active_theme(self.selected_theme.get())
+        except ValueError as e:
+            messagebox.showerror("Invalid Theme", str(e))
+            return
         self.show_step(0)
 
     def render_tools_page(self):
@@ -297,10 +300,16 @@ Essential Global Shortcuts:
             self.show_step(3)
         elif self.current_step == 3:
             # Finish wizard and launch welcome app
-            self.destroy()
-            from gui.ars_welcome.main import ArsWelcomeApp
-            app = ArsWelcomeApp()
-            app.mainloop()
+            try:
+                self.destroy()
+            except tk.TclError:
+                pass
+            try:
+                from gui.ars_welcome.main import ArsWelcomeApp
+                app = ArsWelcomeApp()
+                app.mainloop()
+            except Exception as e:
+                show_info_dialog("The Forge Unavailable", f"Welcome hub failed to start:\n{e}")
         else:
             self.show_step(self.current_step + 1)
 

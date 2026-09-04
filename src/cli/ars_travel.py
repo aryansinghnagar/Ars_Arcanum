@@ -48,6 +48,12 @@ def calculate_transit(
     weather: str = "clear",
     party_size: int = 4,
 ) -> Dict[str, Any]:
+    """Transit model. Unknown mode/terrain/weather fall back to defaults
+    (infantry/plains/clear); CLI restricts choices via argparse."""
+    if distance_miles < 0:
+        raise ValueError("distance must be >= 0")
+    if party_size <= 0:
+        raise ValueError("party_size must be >= 1")
     v_data = VELOCITIES.get(mode, VELOCITIES["infantry"])
     base_speed = v_data["speed_mpd"]
     t_friction = TERRAIN_FRICTION.get(terrain, 1.0)
@@ -94,12 +100,17 @@ def print_travel_report(res: Dict[str, Any]) -> None:
 
 def main():
     parser = argparse.ArgumentParser(description="Ars Arcanum Travel & Transit Time Calculator")
-    parser.add_argument("distance", type=float, help="Distance in miles")
+    parser.add_argument("distance", type=float, help="Distance in miles (>= 0)")
     parser.add_argument("-m", "--mode", choices=list(VELOCITIES.keys()), default="infantry", help="Transportation mode")
     parser.add_argument("-t", "--terrain", choices=list(TERRAIN_FRICTION.keys()), default="plains", help="Terrain category")
     parser.add_argument("-w", "--weather", choices=list(WEATHER_MODIFIERS.keys()), default="clear", help="Weather conditions")
-    parser.add_argument("-p", "--party", type=int, default=4, help="Party size")
+    parser.add_argument("-p", "--party", type=int, default=4, help="Party size (>= 1)")
     args = parser.parse_args()
+
+    if args.distance < 0:
+        parser.error("distance must be >= 0")
+    if args.party <= 0:
+        parser.error("party size must be >= 1")
 
     result = calculate_transit(
         distance_miles=args.distance,

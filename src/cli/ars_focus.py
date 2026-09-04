@@ -23,20 +23,101 @@ from common.ui_helpers import show_notification, ask_text_input, show_info_dialo
 FOCUS_STATE_FILE = DEFAULT_CONFIG_DIR / "focus_state.txt"
 FOCUS_START_TIME_FILE = DEFAULT_CONFIG_DIR / "focus_start_time.txt"
 FOCUS_START_WORDS_FILE = DEFAULT_CONFIG_DIR / "focus_start_words.txt"
+FOCUS_LOCK_FILE = DEFAULT_CONFIG_DIR / "focus.lock"
+# Portable fallback when PID liveness cannot be determined (e.g. Windows sig 0)
+_LOCK_STALE_AFTER_S = 24 * 3600
+
+
+def _atomic_write(path: Path, text: str) -> None:
+    """Atomic state-file write (tmp + rename) to avoid torn focus state."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    tmp = path.with_suffix(path.suffix + ".tmp")
+    tmp.write_text(text, encoding="utf-8")
+    tmp.replace(path)
+
+
+def _pid_alive(pid: int) -> bool | None:
+    """True if pid exists, False if definitely dead, None if the platform can't say.
+
+    os.kill(pid, 0) is POSIX-only semantics: on Windows os.kill can terminate
+    the target (including ourselves), so it must never be used there — callers
+    fall back to age-based staleness instead.
+    """
+    if os.name != "posix":
+        return None
+    try:
+        os.kill(pid, 0)
+    except ProcessLookupError:
+        return False
+    except PermissionError:
+        return True  # a live process we may not signal
+    except OSError:
+        return None
+    else:
+        return True
+
+
+def acquire_focus_lock(lock_path: Path = FOCUS_LOCK_FILE) -> bool:
+    """Atomically claim the extreme-focus lock (O_EXCL create).
+
+    Reclaims the lock only when the owner is provably dead, or — when PID
+    liveness is indeterminable — when the lock is older than _LOCK_STALE_AFTER_S.
+    At most two attempts; returns False when a live session owns the lock.
+    """
+    ensure_base_directories()
+    for _ in range(2):
+        try:
+            fd = os.open(str(lock_path), os.O_CREAT | os.O_EXCL | os.O_WRONLY)
+        except FileExistsError:
+            pass
+        except OSError as e:
+            print(f"[!] Cannot create focus lock: {e}")
+            return False
+        else:
+            try:
+                os.write(fd, f"{os.getpid()}:{time.time():.0f}".encode("utf-8"))
+            finally:
+                os.close(fd)
+            return True
+        try:
+            pid_s, _, ts_s = lock_path.read_text(encoding="utf-8").strip().partition(":")
+            owner_pid, owner_ts = int(pid_s), float(ts_s)
+        except (OSError, ValueError):
+            owner_pid, owner_ts = -1, 0.0
+        alive = _pid_alive(owner_pid) if owner_pid > 0 else False
+        stale = alive is False or (alive is None and time.time() - owner_ts > _LOCK_STALE_AFTER_S)
+        if not stale:
+            print(f"[*] Focus session already owned by live process {owner_pid}; refusing concurrent session.")
+            return False
+        try:
+            lock_path.unlink()
+        except OSError:
+            return False
+    return False
+
+
+def release_focus_lock(lock_path: Path = FOCUS_LOCK_FILE) -> None:
+    try:
+        lock_path.unlink(missing_ok=True)
+    except OSError:
+        pass
 
 
 def get_current_focus_mode() -> str:
     """Return 'off', 'dnd', or 'extreme'."""
-    if FOCUS_STATE_FILE.exists():
-        mode = FOCUS_STATE_FILE.read_text(encoding="utf-8").strip().lower()
-        if mode in ("dnd", "extreme"):
-            return mode
+    try:
+        if FOCUS_STATE_FILE.exists():
+            mode = FOCUS_STATE_FILE.read_text(encoding="utf-8").strip().lower()
+            if mode in ("dnd", "extreme"):
+                return mode
+    except OSError:
+        pass
     return "off"
 
 
 def set_focus_mode_record(mode: str) -> None:
     ensure_base_directories()
-    FOCUS_STATE_FILE.write_text(mode.lower(), encoding="utf-8")
+    _atomic_write(FOCUS_STATE_FILE, mode.lower())
 
 
 def pause_notifications(pause: bool = True) -> None:
@@ -45,7 +126,7 @@ def pause_notifications(pause: bool = True) -> None:
         try:
             cmd = ["dunstctl", "set-paused", "true" if pause else "false"]
             subprocess.run(cmd, check=False, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-        except Exception:
+        except OSError:
             pass
 
 
@@ -54,7 +135,7 @@ def start_timewarrior(tag: str = "Drafting") -> None:
     if shutil.which("timew"):
         try:
             subprocess.run(["timew", "start", tag], check=False, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-        except Exception:
+        except OSError:
             pass
 
 
@@ -63,7 +144,7 @@ def stop_timewarrior() -> None:
     if shutil.which("timew"):
         try:
             subprocess.run(["timew", "stop"], check=False, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-        except Exception:
+        except OSError:
             pass
 
 
@@ -77,12 +158,17 @@ def enter_dnd_mode() -> None:
 
 def enter_extreme_mode() -> None:
     """Engage Extreme Focus Mode (kiosk, fullscreen drafting, panel hide, timer start)."""
+    if get_current_focus_mode() == "extreme":
+        print("[*] Extreme Focus already active — not overwriting session start.")
+        return
+    if not acquire_focus_lock():
+        return
     world_path = get_active_world_path()
     start_words = calculate_world_word_count(world_path) if world_path else 0
 
     ensure_base_directories()
-    FOCUS_START_TIME_FILE.write_text(str(time.time()), encoding="utf-8")
-    FOCUS_START_WORDS_FILE.write_text(str(start_words), encoding="utf-8")
+    _atomic_write(FOCUS_START_TIME_FILE, str(time.time()))
+    _atomic_write(FOCUS_START_WORDS_FILE, str(start_words))
     set_focus_mode_record("extreme")
 
     # Mute notifications
@@ -96,14 +182,14 @@ def enter_extreme_mode() -> None:
         try:
             # Set panel autohide or minimize
             subprocess.run(["xfconf-query", "-c", "xfce4-panel", "-p", "/panels/panel-1/autohide-behavior", "-s", "2"], check=False)
-        except Exception:
+        except OSError:
             pass
 
     # Fullscreen active window via wmctrl or xdotool
     if shutil.which("wmctrl"):
         try:
             subprocess.run(["wmctrl", "-r", ":ACTIVE:", "-b", "add,fullscreen"], check=False)
-        except Exception:
+        except OSError:
             pass
 
     show_notification("Extreme Focus Activated", "Kiosk engaged. Press Super+Escape when finished.", urgency="critical", icon="dialog-password")
@@ -122,7 +208,7 @@ def exit_focus_mode() -> None:
     if FOCUS_START_TIME_FILE.exists():
         try:
             start_time = float(FOCUS_START_TIME_FILE.read_text(encoding="utf-8").strip())
-        except ValueError:
+        except (ValueError, OSError):
             pass
 
     duration_min = max(0.1, (time.time() - start_time) / 60.0)
@@ -133,7 +219,7 @@ def exit_focus_mode() -> None:
     if FOCUS_START_WORDS_FILE.exists():
         try:
             start_words = int(FOCUS_START_WORDS_FILE.read_text(encoding="utf-8").strip())
-        except ValueError:
+        except (ValueError, OSError):
             pass
 
     current_words = calculate_world_word_count(world_path) if world_path else 0
@@ -149,17 +235,18 @@ def exit_focus_mode() -> None:
     if shutil.which("xfconf-query"):
         try:
             subprocess.run(["xfconf-query", "-c", "xfce4-panel", "-p", "/panels/panel-1/autohide-behavior", "-s", "0"], check=False)
-        except Exception:
+        except OSError:
             pass
 
     # Remove fullscreen kiosk
     if shutil.which("wmctrl"):
         try:
             subprocess.run(["wmctrl", "-r", ":ACTIVE:", "-b", "remove,fullscreen"], check=False)
-        except Exception:
+        except OSError:
             pass
 
     set_focus_mode_record("off")
+    release_focus_lock()
 
     # Clean temporary timestamp files
     if FOCUS_START_TIME_FILE.exists():

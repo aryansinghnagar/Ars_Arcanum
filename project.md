@@ -32,7 +32,7 @@
 ├── src/                   # Python & POSIX source code for the ars-* tool suite & GUI apps
 │   ├── common/            # Shared libraries (git_ops, lore_parser, config, logger)
 │   ├── cli/               # CLI commands installed to /usr/local/bin/
-│   └── gui/               # PyQt6 desktop applications (ars-wizard, ars-welcome)
+│   └── gui/               # tkinter desktop applications (ars-wizard, ars-welcome)
 ├── themes/                # 5 core theme packages (Grimoire, Astral, Sylvan, Obsidian, Ivory)
 ├── templates/             # 5 author methodology template packs
 ├── sample_world/          # "World of Elaris" reference project

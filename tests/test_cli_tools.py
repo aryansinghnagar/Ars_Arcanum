@@ -87,8 +87,11 @@ The armies collided in thunder.
     assert 'font: "Cinzel"' in typst_doc
 
 
-def test_theme_settings():
+def test_theme_settings(temp_world_env):
+    import common.config as cfg
+    # Isolated: temp_world_env monkeypatches DEFAULT_CONFIG_DIR
     set_active_theme("sylvan")
     assert get_active_theme() == "sylvan"
+    assert (cfg.DEFAULT_CONFIG_DIR / "active_theme.txt").exists()
     set_active_theme("grimoire")
     assert get_active_theme() == "grimoire"

@@ -1,4 +1,5 @@
 # AppArmor profile for novelWriter in Ars Arcanum
+# Covers both APT (/usr/bin) and pip --target installs (/usr/local/bin).
 
 abi <abi/3.0>,
 include <tunables/global>

@@ -5,6 +5,7 @@ Mounts authorized USB mass storage devices with USBGuard verification and safe m
 """
 
 import os
+import re
 import sys
 import shutil
 import argparse
@@ -13,6 +14,13 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from common.ui_helpers import show_notification, show_info_dialog, show_error_dialog, ask_confirmation
+
+# Strict allowlist: sd[a-z]+[0-9]+, nvme0n1pN, mmcblkNpN — no paths, no flags.
+DEVICE_RE = re.compile(r"^(sd[a-z]+[0-9]+|nvme\d+n\d+p\d+|mmcblk\d+p\d+|vd[a-z]+[0-9]+)$")
+
+
+def is_valid_device_name(name: str) -> bool:
+    return bool(DEVICE_RE.match(name or ""))
 
 
 def list_unmounted_usb_devices() -> list:
@@ -25,25 +33,34 @@ def list_unmounted_usb_devices() -> list:
                 capture_output=True,
                 text=True,
             )
+            if not proc.stdout.strip():
+                return []
             import json
             data = json.loads(proc.stdout)
             for dev in data.get("blockdevices", []):
                 if dev.get("tran") == "usb":
                     for part in dev.get("children", [dev]):
                         if not part.get("mountpoint") and part.get("type") == "part":
-                            devices.append(part)
-        except Exception:
+                            if is_valid_device_name(part.get("name", "")):
+                                devices.append(part)
+        except (subprocess.SubprocessError, ValueError, OSError):
             pass
     return devices
 
 
-def mount_device(device_name: str) -> bool:
+def mount_device(device_name: str, allowed: set | None = None) -> bool:
+    if not is_valid_device_name(device_name):
+        print(f"[!] Refusing to mount invalid device name: {device_name!r}")
+        return False
+    if allowed is not None and device_name not in allowed:
+        print(f"[!] Device {device_name!r} not in detected USB allowlist. Aborting.")
+        return False
     dev_path = f"/dev/{device_name}"
     mount_base = Path(f"/media/{os.getenv('USER', 'author')}")
     mount_point = mount_base / device_name
     mount_point.mkdir(parents=True, exist_ok=True)
 
-    print(f"[*] Mounting {dev_path} to {mount_point} with secure flags (nosuid, nodev)...")
+    print(f"[*] Mounting {dev_path} to {mount_point} with secure flags (nosuid, nodev, noexec)...")
     try:
         # Use udisksctl or direct mount
         if shutil.which("udisksctl"):
@@ -55,8 +72,8 @@ def mount_device(device_name: str) -> bool:
             else:
                 print(f"[!] udisksctl mount warning: {res.stderr}")
 
-        # Fallback to sudo mount
-        res = subprocess.run(["sudo", "mount", "-o", "nosuid,nodev", dev_path, str(mount_point)], capture_output=True, text=True)
+        # Fallback to sudo mount (hardened flags; udisksctl path uses system defaults)
+        res = subprocess.run(["sudo", "mount", "-o", "nosuid,nodev,noexec", dev_path, str(mount_point)], capture_output=True, text=True)
         if res.returncode == 0:
             print(f"[+] Successfully mounted {dev_path} at {mount_point}")
             show_notification("USB Drive Mounted", f"Mounted at {mount_point}", urgency="normal", icon="drive-removable-media")
@@ -64,7 +81,7 @@ def mount_device(device_name: str) -> bool:
         else:
             print(f"[!] Mount error: {res.stderr}")
             return False
-    except Exception as e:
+    except OSError as e:
         print(f"[!] Mount failure: {e}")
         return False
 
@@ -87,10 +104,19 @@ def main():
         if not args.device and devices:
             target = devices[0].get("name")
             if ask_confirmation("Mount USB Drive", f"Authorize and mount USB drive '/dev/{target}'?"):
-                mount_device(target)
+                mount_device(target, allowed={d.get("name") for d in devices})
+            else:
+                print("[*] Mount declined (default-deny).")
         return
 
-    mount_device(args.device)
+    # Explicit device: fail closed against the live USB allowlist.
+    # An empty allowlist means lsblk is missing or no USB device was detected;
+    # mounting by bare name would risk hitting internal disks, so deny.
+    live = {d.get("name") for d in list_unmounted_usb_devices()}
+    if not live:
+        print("[!] No USB devices detected (or lsblk unavailable). Refusing explicit mount — use --list.")
+        return
+    mount_device(args.device, allowed=live)
 
 
 if __name__ == "__main__":

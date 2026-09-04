@@ -4,10 +4,12 @@
 Automates BorgBackup deduplication, AES-256 encrypted archives, and quarterly restore drills.
 """
 
+import os
 import sys
 import shutil
 import argparse
 import subprocess
+import getpass
 from datetime import datetime
 from pathlib import Path
 
@@ -16,6 +18,33 @@ from common.config import DEFAULT_WORLDS_DIR, DEFAULT_CONFIG_DIR
 from common.ui_helpers import show_notification, show_info_dialog, show_error_dialog
 
 BACKUP_VAULT_DIR = Path.home() / ".local" / "share" / "ars-vault"
+
+
+def get_borg_passphrase() -> str | None:
+    """Resolve Borg passphrase from env or interactive prompt. Never hardcode."""
+    pw = os.environ.get("BORG_PASSPHRASE")
+    if pw:
+        return pw
+    passcommand = os.environ.get("BORG_PASSCOMMAND")
+    if passcommand:
+        return None  # caller must use passcommand via shell; signal via None+env passthrough
+    if sys.stdin.isatty():
+        try:
+            pw = getpass.getpass("Borg vault passphrase: ")
+            if pw:
+                return pw
+        except Exception:
+            pass
+    print("[!] BORG_PASSPHRASE not set. Export BORG_PASSPHRASE or BORG_PASSCOMMAND.")
+    return None
+
+
+def _borg_env(passphrase: str | None) -> dict:
+    """Build subprocess env preserving parent PATH etc. + Borg passphrase."""
+    env = dict(os.environ)
+    if passphrase:
+        env["BORG_PASSPHRASE"] = passphrase
+    return env
 
 
 def init_borg_vault(vault_path: Path) -> bool:
@@ -27,9 +56,12 @@ def init_borg_vault(vault_path: Path) -> bool:
     if not vault_path.exists() or not (vault_path / "config").exists():
         print(f"[*] Initializing encrypted BorgBackup vault at: {vault_path}")
         vault_path.mkdir(parents=True, exist_ok=True)
+        passphrase = get_borg_passphrase()
+        if passphrase is None and "BORG_PASSCOMMAND" not in os.environ:
+            return False
         try:
             # Init repository with repokey encryption
-            env = {"BORG_PASSPHRASE": "ars-arcanum-local-vault"}
+            env = _borg_env(passphrase)
             subprocess.run(
                 ["borg", "init", "--encryption=repokey", str(vault_path)],
                 env=env,
@@ -39,7 +71,10 @@ def init_borg_vault(vault_path: Path) -> bool:
             )
             print("[+] Borg vault initialized successfully.")
             return True
-        except Exception as e:
+        except subprocess.CalledProcessError as e:
+            print(f"[!] Failed to initialize Borg vault: {e.stderr or e}")
+            return False
+        except OSError as e:
             print(f"[!] Failed to initialize Borg vault: {e}")
             return False
     return True
@@ -54,8 +89,11 @@ def run_backup(target_repo: Path = BACKUP_VAULT_DIR) -> bool:
     archive_name = f"{target_repo}::worlds-{timestamp}"
 
     print(f"[*] Creating encrypted backup archive: worlds-{timestamp}...")
+    passphrase = get_borg_passphrase()
+    if passphrase is None and "BORG_PASSCOMMAND" not in os.environ:
+        return False
     try:
-        env = {"BORG_PASSPHRASE": "ars-arcanum-local-vault"}
+        env = _borg_env(passphrase)
         proc = subprocess.run(
             [
                 "borg",
@@ -79,7 +117,7 @@ def run_backup(target_repo: Path = BACKUP_VAULT_DIR) -> bool:
         else:
             print(f"[!] Borg error: {proc.stderr}")
             return False
-    except Exception as e:
+    except OSError as e:
         print(f"[!] Backup execution failure: {e}")
         return False
 
@@ -91,8 +129,11 @@ def run_restore_drill(target_repo: Path = BACKUP_VAULT_DIR) -> bool:
         print("[!] BorgBackup not installed.")
         return False
 
+    passphrase = get_borg_passphrase()
+    if passphrase is None and "BORG_PASSCOMMAND" not in os.environ:
+        return False
     try:
-        env = {"BORG_PASSPHRASE": "ars-arcanum-local-vault"}
+        env = _borg_env(passphrase)
         # List archives
         list_proc = subprocess.run(["borg", "list", str(target_repo)], env=env, capture_output=True, text=True)
         if list_proc.returncode != 0:
@@ -121,7 +162,7 @@ def run_restore_drill(target_repo: Path = BACKUP_VAULT_DIR) -> bool:
         else:
             print(f"[!] Integrity check failed: {test_proc.stderr}")
             return False
-    except Exception as e:
+    except OSError as e:
         print(f"[!] Drill failed: {e}")
         return False
 
@@ -132,12 +173,19 @@ def main():
     parser.add_argument("-r", "--repo", help="Custom destination repository path (e.g. external USB mount)")
     args = parser.parse_args()
 
-    repo_path = Path(args.repo) if args.repo else BACKUP_VAULT_DIR
+    if args.repo:
+        repo_path = Path(args.repo).expanduser()
+        if not str(repo_path).strip():
+            print("[!] Empty --repo path.")
+            sys.exit(2)
+    else:
+        repo_path = BACKUP_VAULT_DIR
 
     if args.drill:
-        run_restore_drill(repo_path)
+        ok = run_restore_drill(repo_path)
     else:
-        run_backup(repo_path)
+        ok = run_backup(repo_path)
+    sys.exit(0 if ok else 1)
 
 
 if __name__ == "__main__":

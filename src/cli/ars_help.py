@@ -4,6 +4,7 @@
 Opens the built-in HTML documentation or prints CLI reference when invoked via F1 or terminal.
 """
 
+import os
 import sys
 import shutil
 import argparse
@@ -21,14 +22,18 @@ DOC_PATHS = [
 def launch_help_gui() -> bool:
     """Launch offline help HTML in browser or document viewer."""
     for p in DOC_PATHS:
-        if p.exists():
-            print(f"[*] Opening Ars Arcanum Help System: {p}")
-            if shutil.which("xdg-open"):
-                subprocess.Popen(["xdg-open", str(p)], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-                return True
-            elif sys.platform == "win32":
-                os.startfile(str(p))
-                return True
+        try:
+            if p.exists():
+                print(f"[*] Opening Ars Arcanum Help System: {p}")
+                if shutil.which("xdg-open"):
+                    subprocess.Popen(["xdg-open", str(p)], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                    return True
+                elif sys.platform == "win32":
+                    os.startfile(str(p))  # noqa: S606 - local file path only
+                    return True
+        except OSError as e:
+            print(f"[!] Could not open help file {p}: {e}")
+            continue
     return False
 
 
@@ -82,5 +87,4 @@ def main():
 
 
 if __name__ == "__main__":
-    import os
     main()

@@ -1,23 +1,35 @@
 #!/bin/sh
 # 03-flatpak-isolated-apps.hook.chroot — Sandboxed Flatpak Applications
+# NOTE: Flatpak tracks Flathub latest; exact commit pins are recorded at build
+# time via `flatpak info --show-commit <id> >> build/flatpak-pins.txt`.
+# To reproduce a build, use: flatpak update --commit=<hash> <id>.
 
 set -e
 echo "[*] Configuring Sandboxed Flatpak Runtimes & Isolated Applications..."
 
+FLATPAK_APPS="md.obsidian.Obsidian com.rafaelmardojai.Blanket com.jgraph.drawio.desktop"
+
 if command -v flatpak >/dev/null 2>&1; then
-  flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo || true
-  
+  flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo || echo "[!] WARNING: flathub remote setup failed." >&2
+
   # Install Obsidian with enforced network denial
-  flatpak install -y flathub md.obsidian.Obsidian || true
+  flatpak install --noninteractive -y flathub md.obsidian.Obsidian || echo "[!] WARNING: Obsidian flatpak install failed; continuing." >&2
   flatpak override --nosocket=network md.obsidian.Obsidian || true
 
   # Install Blanket ambient player with network denial
-  flatpak install -y flathub com.rafaelmardojai.Blanket || true
+  flatpak install --noninteractive -y flathub com.rafaelmardojai.Blanket || echo "[!] WARNING: Blanket flatpak install failed; continuing." >&2
   flatpak override --nosocket=network com.rafaelmardojai.Blanket || true
 
   # Install draw.io Desktop
-  flatpak install -y flathub com.jgraph.drawio.desktop || true
+  flatpak install --noninteractive -y flathub com.jgraph.drawio.desktop || echo "[!] WARNING: draw.io flatpak install failed; continuing." >&2
   flatpak override --nosocket=network com.jgraph.drawio.desktop || true
+
+  # Record resolved commits for reproducibility auditing
+  for app in $FLATPAK_APPS; do
+    if flatpak info "$app" >/dev/null 2>&1; then
+      flatpak info --show-commit "$app" 2>/dev/null | sed "s/^/$app /" || true
+    fi
+  done
 fi
 
 echo "[+] Flatpak isolated applications configured."

@@ -92,16 +92,30 @@ def inspect_loop_matrix(world_dir: Path) -> None:
     print(f"Anchor Checkpoint: {data.get('anchor_checkpoint')}\n")
 
     for loop in data.get("loops", []):
-        print(f"--- LOOP ITERATION #{loop['iteration']}: {loop['title']} ---")
-        print(f"  Reset Cause:     {loop.get('cause_of_reset')}")
-        state = loop.get("checkpoint_state", {})
-        print(f"  Trauma Level:    [{'#' * state.get('trauma_level', 1)}{'.' * (10 - state.get('trauma_level', 1))}] ({state.get('trauma_level', 1)}/10)")
-        print(f"  Inventory:       {', '.join(state.get('inventory', []))}")
+        try:
+            iteration = int(loop.get("iteration", "?"))
+        except (TypeError, ValueError):
+            iteration = "?"
+        title = str(loop.get("title", "Untitled"))[:120]
+        print(f"--- LOOP ITERATION #{iteration}: {title} ---")
+        print(f"  Reset Cause:     {loop.get('cause_of_reset', 'unknown')}")
+        state = loop.get("checkpoint_state", {}) if isinstance(loop.get("checkpoint_state"), dict) else {}
+        try:
+            trauma = int(state.get("trauma_level", 1))
+        except (TypeError, ValueError):
+            trauma = 1
+        trauma = max(0, min(10, trauma))
+        print(f"  Trauma Level:    [{'#' * trauma}{'.' * (10 - trauma)}] ({trauma}/10)")
+        inv = state.get("inventory", [])
+        inv = inv if isinstance(inv, list) else [inv]
+        print(f"  Inventory:       {', '.join(str(x)[:80] for x in inv)}")
         print(f"  Knowledge States:")
-        for char, facts in loop.get("knowledge_matrix", {}).items():
-            print(f"    • {char}:")
+        km = loop.get("knowledge_matrix", {}) if isinstance(loop.get("knowledge_matrix"), dict) else {}
+        for char, facts in km.items():
+            print(f"    • {str(char)[:80]}:")
+            facts = facts if isinstance(facts, list) else [facts]
             for fact in facts:
-                print(f"        - {fact}")
+                print(f"        - {str(fact)[:300]}")
         print()
     print(f"=======================================================\n")
 

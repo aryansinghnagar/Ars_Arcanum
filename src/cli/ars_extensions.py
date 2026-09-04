@@ -55,10 +55,14 @@ def is_extension_installed(ext_id: str) -> bool:
     if not data:
         return False
     if data["type"] == "apt":
-        return shutil.which(data["package"]) is not None or shutil.which(ext_id) is not None
+        pkg = data["package"]
+        return shutil.which(pkg) is not None
     elif data["type"] == "asset":
         asset_dir = Path.home() / "Documents" / "Ars-Arcanum-Tutorials" if ext_id == "tutorials" else Path.home() / ".local" / "share" / "kiwix"
-        return asset_dir.exists() and any(asset_dir.iterdir()) if asset_dir.exists() else False
+        try:
+            return asset_dir.exists() and any(asset_dir.iterdir())
+        except OSError:
+            return False
     return False
 
 
@@ -84,17 +88,49 @@ def install_extension(ext_id: str) -> bool:
 
     print(f"[*] Installing extension: {info['name']}...")
     if info["type"] == "apt":
+        pkg = info["package"]
+        # Allowlist: only known APT packages from EXTENSIONS table, no shell.
+        allowed = {v["package"] for v in EXTENSIONS.values() if v["type"] == "apt"}
+        if pkg not in allowed:
+            print(f"[!] Package '{pkg}' not in extension allowlist. Aborting.")
+            return False
         if shutil.which("apt-get"):
             try:
-                subprocess.run(["sudo", "apt-get", "install", "-y", info["package"]], check=True)
+                subprocess.run(["sudo", "apt-get", "install", "-y", "--", pkg], check=True)
                 print(f"[+] Successfully installed {info['name']}.")
                 return True
-            except Exception as e:
+            except (subprocess.CalledProcessError, OSError) as e:
                 print(f"[!] Installation failed: {e}")
                 return False
+        print("[!] apt-get not found; cannot install APT extension.")
+        return False
     else:
         print(f"[+] Scaffolded download manifest for {info['name']} (Storage requirement verified).")
         return True
+
+
+def remove_extension(ext_id: str) -> bool:
+    info = EXTENSIONS.get(ext_id)
+    if not info:
+        print(f"[!] Unknown extension ID: {ext_id}")
+        return False
+    if info["type"] == "apt":
+        pkg = info["package"]
+        allowed = {v["package"] for v in EXTENSIONS.values() if v["type"] == "apt"}
+        if pkg not in allowed:
+            print(f"[!] Package '{pkg}' not in extension allowlist. Aborting.")
+            return False
+        if shutil.which("apt-get"):
+            try:
+                subprocess.run(["sudo", "apt-get", "remove", "-y", "--", pkg], check=True)
+                print(f"[+] Removed {info['name']}.")
+                return True
+            except (subprocess.CalledProcessError, OSError) as e:
+                print(f"[!] Removal failed: {e}")
+                return False
+        print("[!] apt-get not found; cannot remove APT extension.")
+        return False
+    print(f"[*] Asset extension '{ext_id}' is data-only; delete its directory manually.")
     return False
 
 
@@ -104,12 +140,21 @@ def main():
     parser.add_argument("extension_id", nargs="?", help="Extension ID")
     args = parser.parse_args()
 
-    if args.action == "list" or not args.extension_id:
+    if args.action == "list":
         list_extensions()
     elif args.action == "install":
-        install_extension(args.extension_id)
+        if not args.extension_id:
+            print("[!] 'install' requires an extension ID. Available:")
+            list_extensions()
+            sys.exit(2)
+        ok = install_extension(args.extension_id)
+        sys.exit(0 if ok else 1)
     elif args.action == "remove":
-        print(f"[*] Removing extension {args.extension_id}...")
+        if not args.extension_id:
+            print("[!] 'remove' requires an extension ID.")
+            sys.exit(2)
+        ok = remove_extension(args.extension_id)
+        sys.exit(0 if ok else 1)
 
 
 if __name__ == "__main__":

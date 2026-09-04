@@ -13,5 +13,6 @@
   - 5 Author Methodology Template Packs & "World of Elaris" reference project
   - Offline reference pack (Kiwix Simple English Wikipedia ZIM `937 MB` + 5 Worldbuilder Classics)
   - Calamares graphical installer with LUKS2 full-disk encryption and automated dual-boot partitioning
-- **Test Suite Results**: 20 / 20 Unit Tests Passing (`pytest tests/ -v`)
+- **Test Suite Results**: 44 / 44 Unit Tests Passing (`pytest tests/ -v`) — includes 24 hardening/regression tests (21 in `test_hardening.py`, 3 in `test_security_configs.py`)
 - **Confidence Score**: 1.0 [High]
+- **Last Audit Remediation**: 2026-09-04 — 5 High + 12 Medium findings fixed (Borg passphrase, USB mount, Calamares wiring, pycache hygiene, security reconciliation, build pins, CLI/GUI hardening), plus re-audit residuals (mount fail-closed, docx/all targets, firewall mode-specific relock, supply-chain checksum opt-in), plus design limitations (Typst content-escaping, case-preserving bidirectional multiline lore audit, portable focus lockfile). ISO artifact predates fixes; rebuild via `build/scripts/build_iso_docker.ps1` before deployment.

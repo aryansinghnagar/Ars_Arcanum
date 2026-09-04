@@ -47,7 +47,8 @@ Thumbs.db
 """
             (world_dir / ".gitignore").write_text(gitignore_content, encoding="utf-8")
             return True
-        except Exception:
+        except (subprocess.CalledProcessError, OSError) as e:
+            print(f"[!] git init failed for {world_dir}: {e}")
             return False
     return True
 
@@ -91,7 +92,7 @@ def create_snapshot(world_dir: Path, message_prefix: str = "Session Snapshot") -
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         commit_msg = f"{message_prefix} — {timestamp} [{len(changes)} files modified]"
 
-        commit_proc = subprocess.run(
+        subprocess.run(
             ["git", "commit", "-m", commit_msg],
             cwd=str(world_dir),
             capture_output=True,
@@ -116,7 +117,7 @@ def create_snapshot(world_dir: Path, message_prefix: str = "Session Snapshot") -
 
     except subprocess.CalledProcessError as e:
         result["message"] = f"Git error: {e.stderr if e.stderr else str(e)}"
-    except Exception as e:
+    except OSError as e:
         result["message"] = f"Execution error: {str(e)}"
 
     return result
@@ -129,8 +130,14 @@ def get_commit_history(world_dir: Path, max_count: int = 10) -> List[Dict[str, s
         return history
 
     try:
+        count = int(max_count)
+    except (TypeError, ValueError):
+        count = 10
+    count = max(1, min(100, count))
+
+    try:
         proc = subprocess.run(
-            ["git", "log", f"-n{max_count}", "--pretty=format:%h|%ad|%s", "--date=short"],
+            ["git", "log", f"-n{count}", "--pretty=format:%h|%ad|%s", "--date=short"],
             cwd=str(world_dir),
             capture_output=True,
             text=True,
@@ -140,6 +147,6 @@ def get_commit_history(world_dir: Path, max_count: int = 10) -> List[Dict[str, s
             if "|" in line:
                 h, d, s = line.split("|", 2)
                 history.append({"hash": h, "date": d, "subject": s})
-    except Exception:
+    except (subprocess.CalledProcessError, OSError):
         pass
     return history

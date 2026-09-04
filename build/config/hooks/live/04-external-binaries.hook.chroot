@@ -1,20 +1,40 @@
 #!/bin/sh
 # 04-external-binaries.hook.chroot — Typst, novelWriter & External Tools
+# Pinned versions for reproducibility. Bump TYPST_VERSION / NOVELWRITER_VERSION together.
 
 set -e
 echo "[*] Installing Typst Native Rust Binary & Python Packages..."
 
-# Install novelWriter via pip
+TYPST_VERSION="${TYPST_VERSION:-0.12.0}"
+NOVELWRITER_VERSION="${NOVELWRITER_VERSION:-2.5.3}"
+# Optional integrity pin: export TYPST_SHA256=<hex> to enforce checksum.
+# Obtain from https://github.com/typst/typst/releases (per-version notes).
+TYPST_SHA256="${TYPST_SHA256:-}"
+
+# Install novelWriter via pip (pinned; Debian has no native package)
 if command -v pip3 >/dev/null 2>&1; then
-  pip3 install --break-system-packages novelwriter || true
+  pip3 install --break-system-packages "novelwriter==${NOVELWRITER_VERSION}" || true
 fi
 
-# Fetch and install Typst binary
+# Fetch and install Typst binary (pinned, verified arch)
 if [ ! -f /usr/local/bin/typst ]; then
   ARCH=$(uname -m)
   if [ "$ARCH" = "x86_64" ]; then
-    TYPST_URL="https://github.com/typst/typst/releases/latest/download/typst-x86_64-unknown-linux-musl.tar.xz"
-    curl -sSL "$TYPST_URL" | tar -xJ -C /tmp/ || true
+    TYPST_URL="https://github.com/typst/typst/releases/download/v${TYPST_VERSION}/typst-x86_64-unknown-linux-musl.tar.xz"
+    TMP_TXZ="/tmp/typst-${TYPST_VERSION}.tar.xz"
+    if curl -sSL -o "$TMP_TXZ" "$TYPST_URL"; then
+      if [ -n "$TYPST_SHA256" ]; then
+        echo "${TYPST_SHA256}  ${TMP_TXZ}" | sha256sum -c - || { echo "[!] Typst checksum mismatch; aborting typst install." >&2; rm -f "$TMP_TXZ"; }
+      else
+        echo "[!] WARNING: TYPST_SHA256 unset; installing typst ${TYPST_VERSION} without checksum verification." >&2
+      fi
+      if [ -f "$TMP_TXZ" ]; then
+        tar -xJ -f "$TMP_TXZ" -C /tmp/ || true
+        rm -f "$TMP_TXZ"
+      fi
+    else
+      echo "[!] WARNING: typst download failed; continuing without typst." >&2
+    fi
     if [ -f /tmp/typst-x86_64-unknown-linux-musl/typst ]; then
       mv /tmp/typst-x86_64-unknown-linux-musl/typst /usr/local/bin/typst
       chmod 755 /usr/local/bin/typst
@@ -22,4 +42,4 @@ if [ ! -f /usr/local/bin/typst ]; then
   fi
 fi
 
-echo "[+] External binaries installed."
+echo "[+] External binaries installed (typst ${TYPST_VERSION}, novelwriter ${NOVELWRITER_VERSION})."

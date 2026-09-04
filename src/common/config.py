@@ -65,22 +65,37 @@ def ensure_base_directories() -> None:
     DEFAULT_CACHE_DIR.mkdir(parents=True, exist_ok=True)
 
 
+def _is_safe_world_name(world: str) -> bool:
+    """Plain world names only — no separators or parent references."""
+    return bool(world) and "/" not in world and "\\" not in world and ".." not in world
+
+
 def get_active_world_name() -> Optional[str]:
     """Retrieve the currently active world name from config."""
     state_file = DEFAULT_CONFIG_DIR / "active_world.txt"
-    if state_file.exists():
-        world = state_file.read_text(encoding="utf-8").strip()
-        if world and (DEFAULT_WORLDS_DIR / world).is_dir():
-            return world
-    worlds = list_worlds()
+    try:
+        if state_file.exists():
+            world = state_file.read_text(encoding="utf-8").strip()
+            # Validate stored value: a hand-edited active_world.txt must not escape ~/Worlds
+            if _is_safe_world_name(world) and (DEFAULT_WORLDS_DIR / world).is_dir():
+                return world
+    except OSError:
+        pass
+    try:
+        worlds = list_worlds()
+    except OSError:
+        return None
     return worlds[0] if worlds else None
 
 
 def set_active_world_name(world_name: str) -> None:
-    """Persist the currently active world name."""
+    """Persist the currently active world name (validated to plain name)."""
+    clean = world_name.strip()
+    if not _is_safe_world_name(clean):
+        raise ValueError(f"Invalid world name: {world_name!r}")
     ensure_base_directories()
     state_file = DEFAULT_CONFIG_DIR / "active_world.txt"
-    state_file.write_text(world_name.strip(), encoding="utf-8")
+    state_file.write_text(clean, encoding="utf-8")
 
 
 def get_active_world_path() -> Optional[Path]:
@@ -97,6 +112,9 @@ def resolve_world_path(target: Optional[str] = None) -> Optional[Path]:
     """
     Universally resolve a world path:
     1. If target is a valid directory path (relative or absolute), return Path(target).
+       Absolute paths are intentionally accepted so scripts/tests can operate on
+       world checkouts outside ~/Worlds; callers needing confinement must check
+       the result against DEFAULT_WORLDS_DIR themselves.
     2. If target is a world name in ~/Worlds, return DEFAULT_WORLDS_DIR / target.
     3. If target is None, return get_active_world_path().
     """
@@ -104,9 +122,11 @@ def resolve_world_path(target: Optional[str] = None) -> Optional[Path]:
         p = Path(target)
         if p.is_dir():
             return p.resolve()
-        w_p = DEFAULT_WORLDS_DIR / target
-        if w_p.is_dir():
-            return w_p.resolve()
+        if _is_safe_world_name(target):
+            w_p = DEFAULT_WORLDS_DIR / target
+            if w_p.is_dir():
+                return w_p.resolve()
+        return None
     return get_active_world_path()
 
 
@@ -126,16 +146,20 @@ def list_worlds() -> List[str]:
 def get_active_theme() -> str:
     """Retrieve current theme name (defaults to 'grimoire')."""
     theme_file = DEFAULT_CONFIG_DIR / "active_theme.txt"
-    if theme_file.exists():
-        theme = theme_file.read_text(encoding="utf-8").strip().lower()
-        if theme in AVAILABLE_THEMES:
-            return theme
+    try:
+        if theme_file.exists():
+            theme = theme_file.read_text(encoding="utf-8").strip().lower()
+            if theme in AVAILABLE_THEMES:
+                return theme
+    except OSError:
+        pass
     return "grimoire"
 
 
 def set_active_theme(theme_name: str) -> None:
-    """Persist active theme name."""
-    if theme_name.lower() in AVAILABLE_THEMES:
-        ensure_base_directories()
-        theme_file = DEFAULT_CONFIG_DIR / "active_theme.txt"
-        theme_file.write_text(theme_name.lower(), encoding="utf-8")
+    """Persist active theme name. Raises ValueError on unknown theme."""
+    if theme_name.lower() not in AVAILABLE_THEMES:
+        raise ValueError(f"Invalid theme: {theme_name!r}. Available: {', '.join(AVAILABLE_THEMES)}")
+    ensure_base_directories()
+    theme_file = DEFAULT_CONFIG_DIR / "active_theme.txt"
+    theme_file.write_text(theme_name.lower(), encoding="utf-8")
