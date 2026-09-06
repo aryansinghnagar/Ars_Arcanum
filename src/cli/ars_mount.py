@@ -13,7 +13,7 @@ import subprocess
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
-from common.ui_helpers import show_notification, show_info_dialog, show_error_dialog, ask_confirmation
+from common.ui_helpers import show_notification, ask_confirmation
 
 # Strict allowlist: sd[a-z]+[0-9]+, nvme0n1pN, mmcblkNpN — no paths, no flags.
 DEVICE_RE = re.compile(r"^(sd[a-z]+[0-9]+|nvme\d+n\d+p\d+|mmcblk\d+p\d+|vd[a-z]+[0-9]+)$")

@@ -11,14 +11,13 @@ import shutil
 import argparse
 import subprocess
 from pathlib import Path
-from datetime import datetime
 
 # Adjust module path for standalone CLI execution
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from common.config import DEFAULT_CONFIG_DIR, get_active_world_path, ensure_base_directories
 from common.git_ops import create_snapshot
 from common.logger import log_writing_session, calculate_world_word_count
-from common.ui_helpers import show_notification, ask_text_input, show_info_dialog
+from common.ui_helpers import show_notification, ask_text_input
 
 FOCUS_STATE_FILE = DEFAULT_CONFIG_DIR / "focus_state.txt"
 FOCUS_START_TIME_FILE = DEFAULT_CONFIG_DIR / "focus_start_time.txt"

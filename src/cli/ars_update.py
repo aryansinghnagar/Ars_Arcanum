@@ -12,7 +12,7 @@ from datetime import datetime
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
-from common.ui_helpers import show_notification, show_info_dialog, show_error_dialog
+from common.ui_helpers import show_notification, show_error_dialog
 
 
 def create_btrfs_snapshot() -> bool:
@@ -105,7 +105,7 @@ def run_system_update() -> bool:
 
 def main():
     parser = argparse.ArgumentParser(description="Ars Arcanum Maintenance & OS Updater")
-    args = parser.parse_args()
+    parser.parse_args()
 
     run_system_update()
 

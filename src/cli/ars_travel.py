@@ -4,7 +4,6 @@
 Calculates medieval & speculative transit durations across custom geography to prevent narrative teleportation.
 """
 
-import sys
 import argparse
 from typing import Dict, Any
 
@@ -83,19 +82,19 @@ def calculate_transit(
 
 
 def print_travel_report(res: Dict[str, Any]) -> None:
-    print(f"\n=======================================================")
-    print(f"       ARS ARCANUM TRAVEL & TRANSIT DISPATCH           ")
-    print(f"=======================================================")
+    print("\n=======================================================")
+    print("       ARS ARCANUM TRAVEL & TRANSIT DISPATCH           ")
+    print("=======================================================")
     print(f"  Distance:        {res['distance']} miles ({res['distance'] * 1.609:.1f} km)")
     print(f"  Transit Mode:    {res['mode_name']}")
     print(f"  Terrain:         {res['terrain'].capitalize()} (Friction: {TERRAIN_FRICTION.get(res['terrain'], 1.0)}x)")
     print(f"  Weather:         {res['weather'].capitalize()} (Modifier: {WEATHER_MODIFIERS.get(res['weather'], 1.0)}x)")
     print(f"  Effective Speed: {res['effective_speed_mpd']} miles/day")
-    print(f"-------------------------------------------------------")
+    print("-------------------------------------------------------")
     print(f"  Total Duration:  {res['days']} Days (~{res['hours']} marching hours)")
     print(f"  Required Camps:  {res['camp_stops']} night(s) in the field")
     print(f"  Provisions:      {res['rations_lbs']} lbs of rations for {res['party_size']} traveler(s)")
-    print(f"=======================================================\n")
+    print("=======================================================\n")
 
 
 def main():

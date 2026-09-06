@@ -3,11 +3,10 @@ Ars Arcanum — Local Git Operations & Snapshot Engine
 Manages automatic, timestamped version control across user world projects (100% offline).
 """
 
-import os
 import subprocess
 from datetime import datetime
 from pathlib import Path
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any
 
 
 def init_world_git(world_dir: Path) -> bool:

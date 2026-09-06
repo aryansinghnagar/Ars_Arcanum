@@ -11,7 +11,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from common.config import DEFAULT_WORLDS_DIR, list_worlds, get_active_world_path
 from common.git_ops import create_snapshot
-from common.ui_helpers import show_notification, show_info_dialog
+from common.ui_helpers import show_notification
 
 
 def run_snapshots(target_world: str = None, all_worlds: bool = False) -> int:

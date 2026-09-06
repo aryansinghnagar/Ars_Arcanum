@@ -13,8 +13,8 @@ SRC_DIR = Path(__file__).resolve().parent.parent / "src"
 if str(SRC_DIR) not in sys.path:
     sys.path.insert(0, str(SRC_DIR))
 
-import common.config as cfg
-from gui.ars_wizard.scaffold import scaffold_world_project
+import common.config as cfg  # noqa: E402
+from gui.ars_wizard.scaffold import scaffold_world_project  # noqa: E402
 
 
 @pytest.fixture

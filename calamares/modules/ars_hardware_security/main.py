@@ -4,8 +4,6 @@ Calamares Python Job Module: ars_hardware_security
 Enrolls Secure Boot keys via sbctl and enables strict USBGuard allowlisting if selected.
 """
 
-import os
-import subprocess
 
 import libcalamares
 

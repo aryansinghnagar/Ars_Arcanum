@@ -67,15 +67,15 @@ def is_extension_installed(ext_id: str) -> bool:
 
 
 def list_extensions() -> None:
-    print(f"\n=======================================================")
-    print(f"       ARS ARCANUM EXTENSION & TOOL DIRECTORY          ")
-    print(f"=======================================================\n")
+    print("\n=======================================================")
+    print("       ARS ARCANUM EXTENSION & TOOL DIRECTORY          ")
+    print("=======================================================\n")
     for ext_id, info in EXTENSIONS.items():
         status = "[INSTALLED]" if is_extension_installed(ext_id) else "[AVAILABLE]"
         print(f"{status.ljust(13)} {info['name']} ({ext_id})")
         print(f"             Category: {info['category']} | {info['description']}")
         print()
-    print(f"=======================================================\n")
+    print("=======================================================\n")
     print("To install:   ars-extensions install <id>")
     print("To remove:    ars-extensions remove <id>\n")
 

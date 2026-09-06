@@ -4,7 +4,6 @@ Ars Arcanum — Live-Build Chroot Overlay Synchronizer
 Prepares includes.chroot filesystem tree from repository source before live-build compilation.
 """
 
-import os
 import shutil
 from pathlib import Path
 

@@ -19,8 +19,8 @@ def test_sysctl_hardening_rules():
     assert "kernel.yama.ptrace_scope = 2" in content
     assert "net.ipv4.conf.all.send_redirects = 0" in content
     # Regression: unprivileged_userns_clone=0 breaks Flatpak; must stay disabled/commented
-    active = [l for l in content.splitlines() if l.strip() and not l.strip().startswith("#")]
-    assert not any("unprivileged_userns_clone" in l for l in active)
+    active = [line for line in content.splitlines() if line.strip() and not line.strip().startswith("#")]
+    assert not any("unprivileged_userns_clone" in line for line in active)
 
 
 def test_nftables_paranoid_ruleset():

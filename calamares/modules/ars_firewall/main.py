@@ -6,7 +6,6 @@ Applies selected nftables firewall policy (Paranoid vs. Standard) to target inst
 
 import os
 import shutil
-import subprocess
 
 import libcalamares
 

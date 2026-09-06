@@ -3,7 +3,6 @@ Ars Arcanum — Writing Session Logger & Metrics Tracker
 Logs drafting duration, words added, focus mode duration into ~/Worlds/<World>/09-Backups/session_logs.md
 """
 
-import os
 from datetime import datetime
 from pathlib import Path
 from typing import Optional

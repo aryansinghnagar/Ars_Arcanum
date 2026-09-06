@@ -14,8 +14,8 @@ from datetime import datetime
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
-from common.config import DEFAULT_WORLDS_DIR, DEFAULT_CONFIG_DIR
-from common.ui_helpers import show_notification, show_info_dialog, show_error_dialog
+from common.config import DEFAULT_WORLDS_DIR
+from common.ui_helpers import show_notification
 
 BACKUP_VAULT_DIR = Path.home() / ".local" / "share" / "ars-vault"
 

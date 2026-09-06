@@ -1,0 +1,4 @@
+# Ars Arcanum — Development & Testing Dependencies
+pytest>=8.0.0
+pytest-cov>=4.0.0
+ruff>=0.4.0

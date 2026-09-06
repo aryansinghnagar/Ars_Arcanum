@@ -1,10 +1,65 @@
-# Python
+# ==============================================================================
+# Ars Arcanum — Git Ignore Rules
+# ==============================================================================
+
+# --- Python & Bytecode ---
 __pycache__/
 *.py[cod]
 *$py.class
-.pytest_cache/
+*.so
+.Python
+build/lib/
+build/bdist.*/
+*.egg-info/
+dist/
+*.egg
 
-# Live-build generated metadata & intermediate artifacts
+# --- Virtual Environments ---
+.venv/
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# --- Testing, Coverage & Linters ---
+.pytest_cache/
+.coverage
+.coverage.*
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+htmlcov/
+.tox/
+.nox/
+.hypothesis/
+.mypy_cache/
+.ruff_cache/
+
+# --- Operating System Artifacts ---
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+[Dd]esktop.ini
+
+# --- Editors & IDEs ---
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+*.bak
+
+# --- Logs & Temporary Files ---
+*.log
+*.tmp
+
+# --- Debian Live-Build Artifacts & Metadata ---
 build/.build/
 build/config/binary
 build/config/bootstrap
@@ -14,14 +69,15 @@ build/config/source
 build/config/hooks/live/00*
 build/config/hooks/normal/
 build/output/
-*.tmp
 *.iso
 *.squashfs
 
-# Large ZIM archives
+# --- Large Offline Reference Archives & Cache ---
 *.zim
+build/config/includes.chroot/var/
 
-# Generated live-build overlay (regenerate via build/scripts/prepare_overlay.py)
+# --- Generated Live-Build Chroot Overlay ---
+# (Can be regenerated at any time via build/scripts/prepare_overlay.py)
 build/config/includes.chroot/etc/apparmor.d/
 build/config/includes.chroot/etc/nftables/
 build/config/includes.chroot/etc/sysctl.d/
@@ -34,3 +90,9 @@ build/config/includes.chroot/usr/share/ars-arcanum/
 build/config/includes.chroot/usr/share/doc/
 build/config/includes.chroot/usr/share/themes/
 build/config/includes.chroot/etc/skel/Documents/Ars-Arcanum-Manual.typ
+
+# --- Compiled Artifacts & Exports ---
+build/config/includes.chroot/etc/skel/Documents/Ars-Arcanum-Manual.pdf
+docs/typst_manual/*.pdf
+sample_world/07-Publishing/Print-PDF/*.pdf
+sample_world/07-Publishing/Digital-EPUB/*.epub

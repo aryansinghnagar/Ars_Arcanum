@@ -2,8 +2,7 @@
 Unit tests for Ars Arcanum CLI tool suite.
 """
 
-from pathlib import Path
-from common.config import list_worlds, get_active_theme, set_active_theme
+from common.config import get_active_theme, set_active_theme
 from common.git_ops import create_snapshot, get_commit_history
 from common.logger import calculate_world_word_count, log_writing_session
 from cli.ars_travel import calculate_transit

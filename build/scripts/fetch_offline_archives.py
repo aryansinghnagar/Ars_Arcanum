@@ -4,7 +4,6 @@ Ars Arcanum — Offline Reference Archive Downloader
 Dynamically discovers and downloads latest Kiwix ZIM archives and dictionaries with live progress.
 """
 
-import os
 import re
 import sys
 import argparse

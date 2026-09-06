@@ -2,11 +2,9 @@
 Unit tests for lore_parser.py and continuity auditing.
 """
 
-from pathlib import Path
 from common.lore_parser import (
     parse_frontmatter,
     format_frontmatter,
-    extract_world_entities,
     audit_manuscript_consistency,
 )
 

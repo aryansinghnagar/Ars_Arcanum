@@ -4,18 +4,17 @@
 Compiles Markdown / novelWriter projects into publication-grade Typst Print PDFs, EPUB 3, and DOCX.
 """
 
-import os
 import sys
 import shutil
 import argparse
 import subprocess
 from pathlib import Path
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from common.config import resolve_world_path
 from common.lore_parser import parse_frontmatter
-from common.ui_helpers import show_notification, show_info_dialog, show_error_dialog
+from common.ui_helpers import show_notification
 
 
 def _typst_escape(s: str) -> str:

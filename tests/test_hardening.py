@@ -5,9 +5,6 @@ loop trauma clamp, snapshot traversal guard, frontmatter numeric types,
 typst escaping, theme exit codes.
 """
 
-import os
-import sys
-from pathlib import Path
 
 import pytest
 
@@ -156,7 +153,6 @@ def test_focus_lock_roundtrip(tmp_path):
 
 
 def test_focus_lock_reclaims_dead_owner(tmp_path):
-    import time
     import cli.ars_focus as focus
     lock = tmp_path / "focus.lock"
     lock.write_text("999999999:0", encoding="utf-8")  # dead PID, ancient

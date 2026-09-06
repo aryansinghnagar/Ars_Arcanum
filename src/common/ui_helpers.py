@@ -3,10 +3,9 @@ Ars Arcanum — Unified Desktop UI Dialog & Notification Helpers
 Provides seamless GUI dialogs with Zenity/Yad fallback if running in minimal headless or CLI environments.
 """
 
-import os
 import shutil
 import subprocess
-from typing import Optional, List
+from typing import Optional
 
 
 def show_notification(title: str, message: str, urgency: str = "normal", icon: str = "document-edit") -> None:

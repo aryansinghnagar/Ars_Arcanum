@@ -3,10 +3,9 @@ Ars Arcanum — Markdown YAML Frontmatter & Lore Consistency Parser
 Parses world bible sheets and manuscripts for entity models, continuity checking, and compilation.
 """
 
-import os
 import re
 from pathlib import Path
-from typing import Dict, Any, List, Tuple, Optional
+from typing import Dict, Any, List, Tuple
 
 
 def parse_frontmatter(content: str) -> Tuple[Dict[str, Any], str]:

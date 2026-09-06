@@ -3,9 +3,8 @@ Ars Arcanum — Common Foundation Library
 Core configuration, filesystem resolution, and environment discovery.
 """
 
-import os
 from pathlib import Path
-from typing import Optional, List, Dict, Any
+from typing import Optional, List
 
 # Root filesystem constants
 DEFAULT_WORLDS_DIR = Path.home() / "Worlds"

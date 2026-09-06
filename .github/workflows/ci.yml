@@ -1,0 +1,80 @@
+name: Ars Arcanum CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint-and-validate:
+    name: Code Quality & Syntax Validation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install Linting Tools
+        run: |
+          python -m pip install --upgrade pip
+          pip install ruff
+
+      - name: Verify Python Compilation (Syntax Check)
+        run: python -m compileall -q .
+
+      - name: Run Ruff Linter
+        run: ruff check .
+
+      - name: Validate Shell Scripts Syntax
+        run: |
+          for sh_file in build/scripts/*.sh build/auto/*; do
+            if [ -f "$sh_file" ]; then
+              bash -n "$sh_file"
+            fi
+          done
+
+      - name: Validate Package Lists Integrity
+        run: |
+          for list_file in build/config/package-lists/*.list.chroot; do
+            test -s "$list_file" || { echo "Empty package list: $list_file"; exit 1; }
+          done
+
+  test:
+    name: Test Suite (Python ${{ matrix.python-version }})
+    needs: lint-and-validate
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ['3.11', '3.12', '3.13']
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: 'pip'
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-dev.txt
+
+      - name: Test Chroot Overlay Synchronization
+        run: python build/scripts/prepare_overlay.py
+
+      - name: Run Pytest Test Suite
+        run: pytest -v --tb=short

@@ -11,7 +11,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from common.config import resolve_world_path
 from common.lore_parser import audit_manuscript_consistency, extract_world_entities
-from common.ui_helpers import show_notification, show_info_dialog
+from common.ui_helpers import show_notification
 
 
 def run_audit(world_dir: Path) -> int:

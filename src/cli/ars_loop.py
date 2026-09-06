@@ -8,7 +8,6 @@ import json
 import sys
 import argparse
 from pathlib import Path
-from typing import Dict, Any, List
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from common.config import resolve_world_path
@@ -85,10 +84,10 @@ def inspect_loop_matrix(world_dir: Path) -> None:
         print(f"[!] Error reading loop matrix {loop_file}: {e}")
         return
 
-    print(f"\n=======================================================")
-    print(f"       ARS ARCANUM NON-LINEAR LOOP MATRIX             ")
+    print("\n=======================================================")
+    print("       ARS ARCANUM NON-LINEAR LOOP MATRIX             ")
     print(f"       World: {data.get('world', world_dir.name)}     ")
-    print(f"=======================================================")
+    print("=======================================================")
     print(f"Anchor Checkpoint: {data.get('anchor_checkpoint')}\n")
 
     for loop in data.get("loops", []):
@@ -109,7 +108,7 @@ def inspect_loop_matrix(world_dir: Path) -> None:
         inv = state.get("inventory", [])
         inv = inv if isinstance(inv, list) else [inv]
         print(f"  Inventory:       {', '.join(str(x)[:80] for x in inv)}")
-        print(f"  Knowledge States:")
+        print("  Knowledge States:")
         km = loop.get("knowledge_matrix", {}) if isinstance(loop.get("knowledge_matrix"), dict) else {}
         for char, facts in km.items():
             print(f"    • {str(char)[:80]}:")
@@ -117,7 +116,7 @@ def inspect_loop_matrix(world_dir: Path) -> None:
             for fact in facts:
                 print(f"        - {str(fact)[:300]}")
         print()
-    print(f"=======================================================\n")
+    print("=======================================================\n")
 
 
 def export_drawio_timeline(world_dir: Path) -> Path:
